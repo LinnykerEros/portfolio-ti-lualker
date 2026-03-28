@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Currículo - Lualker</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 0;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', 'Arial', sans-serif;
+      background: #fff;
+      color: #333;
+      width: 210mm;
+      min-height: 297mm;
+      margin: 0 auto;
+      display: flex;
+      print-color-adjust: exact;
+      -webkit-print-color-adjust: exact;
+    }
+
+    /* SIDEBAR */
+    .sidebar {
+      width: 72mm;
+      background: #1a1a2e;
+      color: #ccc;
+      padding: 30px 18px;
+      flex-shrink: 0;
+    }
+
+    .avatar {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #7c5cfc, #38bdf8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px;
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .sidebar .name {
+      text-align: center;
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 4px;
+    }
+
+    .sidebar .role {
+      text-align: center;
+      font-size: 0.68rem;
+      color: #7c5cfc;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 24px;
+    }
+
+    .sidebar h3 {
+      font-size: 0.65rem;
+      color: #7c5cfc;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 10px;
+      padding-bottom: 5px;
+      border-bottom: 1px solid #2a2a4a;
+    }
+
+    .sidebar-section { margin-bottom: 20px; }
+
+    .sidebar p, .sidebar li {
+      font-size: 0.72rem;
+      color: #bbb;
+      line-height: 1.6;
+    }
+
+    .sidebar ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .sidebar li {
+      padding: 3px 0;
+      padding-left: 12px;
+      position: relative;
+    }
+
+    .sidebar li::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 10px;
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: #7c5cfc;
+    }
+
+    .contact-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      margin-bottom: 8px;
+      font-size: 0.72rem;
+      color: #bbb;
+    }
+
+    .contact-icon {
+      color: #7c5cfc;
+      font-size: 0.8rem;
+      flex-shrink: 0;
+      width: 16px;
+      text-align: center;
+    }
+
+    .skill-bar-container { margin-bottom: 8px; }
+
+    .skill-bar-label {
+      font-size: 0.68rem;
+      color: #ccc;
+      margin-bottom: 3px;
+    }
+
+    .skill-bar-track {
+      height: 4px;
+      background: #2a2a4a;
+      border-radius: 2px;
+    }
+
+    .skill-bar-fill {
+      height: 100%;
+      border-radius: 2px;
+      background: linear-gradient(90deg, #7c5cfc, #38bdf8);
+    }
+
+    /* MAIN */
+    .main {
+      flex: 1;
+      padding: 30px 24px;
+    }
+
+    .main h2 {
+      font-size: 0.72rem;
+      color: #7c5cfc;
+      text-transform: uppercase;
+      letter-spacing: 2.5px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid #eee;
+    }
+
+    .main-section { margin-bottom: 22px; }
+
+    .summary {
+      font-size: 0.78rem;
+      color: #555;
+      line-height: 1.7;
+      margin-bottom: 4px;
+    }
+
+    /* EXPERIENCE */
+    .exp-item { margin-bottom: 16px; }
+
+    .exp-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 2px;
+    }
+
+    .exp-title {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #222;
+    }
+
+    .exp-period {
+      font-size: 0.68rem;
+      color: #7c5cfc;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .exp-company {
+      font-size: 0.72rem;
+      color: #888;
+      margin-bottom: 6px;
+    }
+
+    .exp-list {
+      list-style: none;
+      padding: 0;
+    }
+
+    .exp-list li {
+      font-size: 0.72rem;
+      color: #555;
+      line-height: 1.6;
+      padding-left: 14px;
+      position: relative;
+      margin-bottom: 2px;
+    }
+
+    .exp-list li::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 7px;
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: #7c5cfc;
+    }
+
+    /* SKILLS TAGS */
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+
+    .tag {
+      padding: 3px 10px;
+      background: #f0edff;
+      color: #5b3fcc;
+      font-size: 0.65rem;
+      border-radius: 10px;
+      font-weight: 500;
+    }
+
+    /* CERTIFICATIONS */
+    .cert-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
+
+    .cert-item {
+      font-size: 0.72rem;
+      color: #555;
+      padding-left: 14px;
+      position: relative;
+      line-height: 1.5;
+    }
+
+    .cert-item::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 7px;
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: #7c5cfc;
+    }
+
+    .cert-item strong { color: #333; font-weight: 600; }
+
+    @media print {
+      body { width: 210mm; }
+      .sidebar { background: #1a1a2e !important; }
+      .avatar { background: linear-gradient(135deg, #7c5cfc, #38bdf8) !important; }
+      .skill-bar-fill { background: linear-gradient(90deg, #7c5cfc, #38bdf8) !important; }
+      .tag { background: #f0edff !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="avatar">L</div>
+    <div class="name">Lualker</div>
+    <div class="role">Técnico de Telecomunicações</div>
+
+    <div class="sidebar-section">
+      <h3>Contato</h3>
+      <div class="contact-item">
+        <span class="contact-icon">&#9993;</span>
+        <span>lualker@email.com</span>
+      </div>
+      <div class="contact-item">
+        <span class="contact-icon">&#9742;</span>
+        <span>(00) 00000-0000</span>
+      </div>
+      <div class="contact-item">
+        <span class="contact-icon">&#9873;</span>
+        <span>Brasil</span>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <h3>Competências Técnicas</h3>
+      <div class="skill-bar-container">
+        <div class="skill-bar-label">Fibra Óptica (FTTH/FTTX)</div>
+        <div class="skill-bar-track"><div class="skill-bar-fill" style="width:95%;"></div></div>
+      </div>
+      <div class="skill-bar-container">
+        <div class="skill-bar-label">Fusão de Fibra / OTDR</div>
+        <div class="skill-bar-track"><div class="skill-bar-fill" style="width:92%;"></div></div>
+      </div>
+      <div class="skill-bar-container">
+        <div class="skill-bar-label">Redes TCP/IP / Switches</div>
+        <div class="skill-bar-track"><div class="skill-bar-fill" style="width:88%;"></div></div>
+      </div>
+      <div class="skill-bar-container">
+        <div class="skill-bar-label">OLT / ONT (Huawei, ZTE)</div>
+        <div class="skill-bar-track"><div class="skill-bar-fill" style="width:90%;"></div></div>
+      </div>
+      <div class="skill-bar-container">
+        <div class="skill-bar-label">Cabeamento Estruturado</div>
+        <div class="skill-bar-track"><div class="skill-bar-fill" style="width:85%;"></div></div>
+      </div>
+      <div class="skill-bar-container">
+        <div class="skill-bar-label">CFTV / Câmeras IP</div>
+        <div class="skill-bar-track"><div class="skill-bar-fill" style="width:82%;"></div></div>
+      </div>
+      <div class="skill-bar-container">
+        <div class="skill-bar-label">Projetos e Documentação</div>
+        <div class="skill-bar-track"><div class="skill-bar-fill" style="width:80%;"></div></div>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <h3>Equipamentos</h3>
+      <ul>
+        <li>OTDR (EXFO, VIAVI, Grandway)</li>
+        <li>Power Meter / OLS</li>
+        <li>VFL (Caneta Laser)</li>
+        <li>Máquina de Fusão (Fujikura, Sumitomo)</li>
+        <li>Clivador de Precisão</li>
+        <li>Microscópio de Inspeção</li>
+      </ul>
+    </div>
+
+    <div class="sidebar-section">
+      <h3>Plataformas OLT</h3>
+      <ul>
+        <li>Huawei MA5800</li>
+        <li>ZTE C300 / C600</li>
+        <li>Datacom DM4610</li>
+        <li>Intelbras OLT 8820i</li>
+        <li>Fiberhome AN5516</li>
+        <li>Parks FiberLink</li>
+      </ul>
+    </div>
+
+    <div class="sidebar-section">
+      <h3>Idiomas</h3>
+      <div class="skill-bar-container">
+        <div class="skill-bar-label">Português (Nativo)</div>
+        <div class="skill-bar-track"><div class="skill-bar-fill" style="width:100%;"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <div class="main-section">
+      <h2>Resumo Profissional</h2>
+      <p class="summary">
+        Técnico de Telecomunicações especializado em construção, instalação e manutenção de redes ópticas passivas (GPON/XGS-PON). Experiência completa na cadeia FTTX — desde o projeto e construção de infraestrutura aérea e subterrânea, passando por emenda de fibra óptica por fusão, instalação de CEOs/CTOs, configuração de OLTs e ONTs, até a ativação e testes com OTDR e power meter. Profissional comprometido com qualidade, segurança (NR-10, NR-35) e entrega de conexões estáveis e confiáveis para residências e empresas.
+      </p>
+    </div>
+
+    <div class="main-section">
+      <h2>Experiência Profissional</h2>
+
+      <div class="exp-item">
+        <div class="exp-header">
+          <span class="exp-title">Técnico de Telecomunicações — Especialista FTTX</span>
+          <span class="exp-period">Atual</span>
+        </div>
+        <div class="exp-company">Atuação em campo — Redes de Fibra Óptica</div>
+        <ul class="exp-list">
+          <li>Construção e implantação de redes FTTH com arquitetura PON distribuída (split 1:8 + 1:8)</li>
+          <li>Lançamento de cabos ópticos aéreos (ADSS, Figura-8) e subterrâneos em dutos PEAD</li>
+          <li>Emenda de fibra óptica por fusão com máquinas de alinhamento por núcleo (Fujikura, Sumitomo) — perda média &lt; 0,05 dB</li>
+          <li>Instalação e organização de CEOs (Caixas de Emenda Óptica) de 12 a 288 fibras</li>
+          <li>Montagem de CTOs (Caixas Terminais) com splitters PLC 1:8 e 1:16 em postes e fachadas</li>
+          <li>Instalação de drops aéreos autossustentados e internos até a ONT do cliente</li>
+          <li>Configuração e ativação de OLTs Huawei (MA5800), ZTE (C300/C600), Datacom e Intelbras</li>
+          <li>Provisionamento de ONTs (Huawei HG8245H5, ZTE F670L, Intelbras), VLAN, perfis de banda</li>
+          <li>Testes de aceitação com OTDR bidirecional (1310/1550nm), power meter e VFL</li>
+          <li>Cálculo de orçamento de potência óptica (power budget) para validação de enlaces</li>
+          <li>Configuração de roteadores, switches gerenciáveis, access points e redes Wi-Fi</li>
+          <li>Instalação de sistemas CFTV — câmeras IP, DVRs/NVRs, cabeamento dedicado</li>
+          <li>Instalação e manutenção de sistemas VoIP e centrais PABX</li>
+          <li>Elaboração de documentação técnica: as-built, diagramas de emenda, relatórios fotográficos</li>
+          <li>Diagnóstico e reparo de falhas em enlaces ópticos — identificação de macrobends, conectores sujos, fibras rompidas</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="main-section">
+      <h2>Formação Acadêmica</h2>
+      <div class="exp-item">
+        <div class="exp-header">
+          <span class="exp-title">Curso Técnico em Telecomunicações</span>
+        </div>
+        <div class="exp-company">Sistemas de telecomunicações, redes de dados, infraestrutura óptica, eletrônica aplicada e normas regulatórias.</div>
+      </div>
+    </div>
+
+    <div class="main-section">
+      <h2>Certificações e Treinamentos</h2>
+      <div class="cert-grid">
+        <div class="cert-item"><strong>NR-10</strong> — Segurança em Eletricidade</div>
+        <div class="cert-item"><strong>NR-35</strong> — Trabalho em Altura</div>
+        <div class="cert-item"><strong>NR-18</strong> — Construção Civil</div>
+        <div class="cert-item"><strong>NR-33</strong> — Espaços Confinados</div>
+        <div class="cert-item"><strong>Fibra Óptica</strong> — Emenda e Medição</div>
+        <div class="cert-item"><strong>GPON/XGS-PON</strong> — Redes Ópticas Passivas</div>
+        <div class="cert-item"><strong>OTDR</strong> — Teste e Certificação</div>
+        <div class="cert-item"><strong>Cabeamento Estruturado</strong> — Cat5e/Cat6</div>
+      </div>
+    </div>
+
+    <div class="main-section">
+      <h2>Habilidades e Conhecimentos</h2>
+      <div class="tags">
+        <span class="tag">Fibra Óptica FTTH/FTTB</span>
+        <span class="tag">Fusão de Fibra</span>
+        <span class="tag">OTDR</span>
+        <span class="tag">Power Meter</span>
+        <span class="tag">VFL</span>
+        <span class="tag">Power Budget</span>
+        <span class="tag">GPON / XGS-PON</span>
+        <span class="tag">OLT / ONT / ONU</span>
+        <span class="tag">CEO / CTO / DIO</span>
+        <span class="tag">Splitters PLC</span>
+        <span class="tag">Cabeamento Estruturado</span>
+        <span class="tag">Redes TCP/IP</span>
+        <span class="tag">Roteadores / Switches</span>
+        <span class="tag">Mikrotik</span>
+        <span class="tag">Huawei</span>
+        <span class="tag">Datacom</span>
+        <span class="tag">Wi-Fi / Access Points</span>
+        <span class="tag">VoIP / PABX</span>
+        <span class="tag">CFTV / Câmeras IP</span>
+        <span class="tag">Construção Aérea</span>
+        <span class="tag">Construção Subterrânea</span>
+        <span class="tag">Rede Predial</span>
+        <span class="tag">Projetos e As-Built</span>
+        <span class="tag">OZmap / QGIS</span>
+        <span class="tag">Atendimento ao Cliente</span>
+      </div>
+    </div>
+
+    <div class="main-section">
+      <h2>Áreas de Atuação</h2>
+      <ul class="exp-list">
+        <li>Construção e implantação de redes FTTX (FTTH, FTTB, FTTC)</li>
+        <li>Manutenção preventiva e corretiva de redes ópticas</li>
+        <li>Instalação e configuração de equipamentos ativos (OLT, ONT, switches)</li>
+        <li>Redes corporativas — cabeamento estruturado, Wi-Fi, CFTV, telefonia</li>
+        <li>Projetos de rede, levantamento de infraestrutura e documentação técnica</li>
+      </ul>
+    </div>
+
+  </div>
+
+</body>
+</html>

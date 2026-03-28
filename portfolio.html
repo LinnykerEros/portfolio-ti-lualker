@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lualker - Portfólio</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #0f0f0f;
+      color: #e0e0e0;
+      overflow-x: hidden;
+    }
+
+    /* ===== HEADER / HERO ===== */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 40px 20px;
+      position: relative;
+      background:
+        radial-gradient(ellipse at 30% 50%, rgba(124,92,252,0.08) 0%, transparent 60%),
+        radial-gradient(ellipse at 70% 50%, rgba(56,189,248,0.06) 0%, transparent 60%);
+    }
+
+    .hero-content { max-width: 700px; }
+
+    .avatar {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #7c5cfc, #38bdf8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 30px;
+      font-size: 2.8rem;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: 1px;
+    }
+
+    .hero h1 {
+      font-size: 2.6rem;
+      font-weight: 300;
+      color: #fff;
+      margin-bottom: 8px;
+      letter-spacing: 1px;
+    }
+
+    .hero h1 span { color: #7c5cfc; font-weight: 600; }
+
+    .hero .subtitle {
+      font-size: 1.1rem;
+      color: #7c5cfc;
+      font-weight: 500;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+
+    .hero .bio {
+      font-size: 1rem;
+      color: #999;
+      line-height: 1.7;
+      max-width: 520px;
+      margin: 0 auto 35px;
+    }
+
+    .hero-links {
+      display: flex;
+      gap: 14px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .hero-links a {
+      padding: 12px 28px;
+      border-radius: 30px;
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: all 0.3s;
+    }
+
+    .btn-primary {
+      background: #7c5cfc;
+      color: #fff;
+    }
+
+    .btn-primary:hover { background: #6a48e6; transform: translateY(-2px); }
+
+    .btn-outline {
+      border: 1px solid #333;
+      color: #ccc;
+    }
+
+    .btn-outline:hover { border-color: #7c5cfc; color: #fff; transform: translateY(-2px); }
+
+    .scroll-hint {
+      position: absolute;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: #333;
+      font-size: 0.8rem;
+      letter-spacing: 2px;
+      animation: bounce 2s infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(8px); }
+    }
+
+    /* ===== SECTIONS ===== */
+    section {
+      padding: 80px 20px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .section-title {
+      font-size: 1.6rem;
+      font-weight: 300;
+      color: #fff;
+      margin-bottom: 10px;
+      letter-spacing: 1px;
+    }
+
+    .section-title span { color: #7c5cfc; font-weight: 600; }
+
+    .section-line {
+      width: 50px;
+      height: 3px;
+      background: #7c5cfc;
+      border-radius: 2px;
+      margin-bottom: 40px;
+    }
+
+    /* ===== SOBRE / O QUE FAÇO ===== */
+    .about-text {
+      font-size: 1rem;
+      color: #aaa;
+      line-height: 1.8;
+      margin-bottom: 30px;
+    }
+
+    .about-text strong { color: #e0e0e0; }
+
+    /* ===== CARDS DE SERVIÇO ===== */
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 16px;
+    }
+
+    .service-card {
+      background: #1a1a1a;
+      border: 1px solid #1f1f1f;
+      border-radius: 14px;
+      padding: 28px 24px;
+      transition: all 0.3s;
+    }
+
+    .service-card:hover {
+      border-color: #7c5cfc;
+      transform: translateY(-4px);
+    }
+
+    .service-icon {
+      font-size: 1.8rem;
+      margin-bottom: 16px;
+    }
+
+    .service-card h3 {
+      font-size: 1rem;
+      color: #fff;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+
+    .service-card p {
+      font-size: 0.88rem;
+      color: #777;
+      line-height: 1.6;
+    }
+
+    /* ===== HABILIDADES ===== */
+    .skills-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .skill-tag {
+      padding: 8px 20px;
+      background: #1a1a1a;
+      border: 1px solid #2a2a2a;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      color: #bbb;
+      transition: all 0.2s;
+    }
+
+    .skill-tag:hover {
+      border-color: #7c5cfc;
+      color: #fff;
+    }
+
+    /* ===== EXPERIÊNCIA / TIMELINE ===== */
+    .timeline { position: relative; padding-left: 30px; }
+
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 8px;
+      top: 6px;
+      bottom: 6px;
+      width: 2px;
+      background: #1f1f1f;
+    }
+
+    .timeline-item {
+      position: relative;
+      margin-bottom: 36px;
+    }
+
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: -26px;
+      top: 6px;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #7c5cfc;
+      border: 3px solid #0f0f0f;
+    }
+
+    .timeline-item .period {
+      font-size: 0.78rem;
+      color: #7c5cfc;
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+    }
+
+    .timeline-item h3 {
+      font-size: 1rem;
+      color: #fff;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .timeline-item p {
+      font-size: 0.88rem;
+      color: #777;
+      line-height: 1.6;
+    }
+
+    /* ===== CONTATO ===== */
+    .contact-section {
+      text-align: center;
+      padding-bottom: 100px;
+    }
+
+    .contact-section .section-line { margin: 0 auto 40px; }
+
+    .contact-text {
+      color: #888;
+      font-size: 1rem;
+      margin-bottom: 30px;
+      line-height: 1.7;
+    }
+
+    .contact-info {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      justify-content: center;
+      margin-bottom: 30px;
+    }
+
+    .contact-card {
+      background: #1a1a1a;
+      border: 1px solid #1f1f1f;
+      border-radius: 12px;
+      padding: 20px 30px;
+      text-align: center;
+      transition: border-color 0.3s;
+    }
+
+    .contact-card:hover { border-color: #7c5cfc; }
+
+    .contact-card .label {
+      font-size: 0.75rem;
+      color: #555;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 6px;
+    }
+
+    .contact-card .value {
+      font-size: 0.95rem;
+      color: #ccc;
+    }
+
+    /* ===== FOOTER ===== */
+    footer {
+      text-align: center;
+      padding: 30px 20px;
+      border-top: 1px solid #1a1a1a;
+      font-size: 0.78rem;
+      color: #333;
+    }
+
+    /* ===== NAV ===== */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      padding: 16px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(15,15,15,0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid transparent;
+      transition: border-color 0.3s;
+    }
+
+    nav.scrolled { border-bottom-color: #1a1a1a; }
+
+    nav .logo {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #7c5cfc;
+      letter-spacing: 2px;
+      text-decoration: none;
+    }
+
+    nav .nav-links { display: flex; gap: 24px; }
+
+    nav .nav-links a {
+      text-decoration: none;
+      color: #666;
+      font-size: 0.85rem;
+      transition: color 0.2s;
+    }
+
+    nav .nav-links a:hover { color: #fff; }
+
+    @media (max-width: 600px) {
+      .hero h1 { font-size: 1.8rem; }
+      nav .nav-links { gap: 14px; }
+      nav .nav-links a { font-size: 0.78rem; }
+      section { padding: 60px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav id="navbar">
+    <a href="#" class="logo">lualker</a>
+    <div class="nav-links">
+      <a href="#sobre">Sobre</a>
+      <a href="#servicos">Serviços</a>
+      <a href="#habilidades">Habilidades</a>
+      <a href="#experiencia">Experiência</a>
+      <a href="#contato">Contato</a>
+      <a href="calculo-fttx.html" style="color:#7c5cfc;">Cálculo FTTX</a>
+      <a href="construcao-fttx.html" style="color:#7c5cfc;">Construção FTTX</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-content">
+      <div class="avatar">L</div>
+      <h1>Eu sou <span>Lualker</span></h1>
+      <p class="subtitle">Técnico de Telecomunicações</p>
+      <p class="bio">
+        Profissional especializado em infraestrutura de telecomunicações,
+        com experiência em instalação, manutenção e configuração de redes
+        ópticas e sistemas de comunicação.
+      </p>
+      <div class="hero-links">
+        <a href="#contato" class="btn-primary">Entre em contato</a>
+        <a href="#servicos" class="btn-outline">Meus serviços</a>
+        <a href="calculo-fttx.html" class="btn-outline">Guia FTTX</a>
+      </div>
+    </div>
+    <div class="scroll-hint">&#8595; role para explorar</div>
+  </section>
+
+  <!-- SOBRE -->
+  <section id="sobre">
+    <h2 class="section-title">Sobre <span>mim</span></h2>
+    <div class="section-line"></div>
+    <p class="about-text">
+      Sou <strong>Técnico de Telecomunicações</strong> com paixão por conectar pessoas e garantir
+      que a comunicação flua sem interrupções. Meu trabalho envolve toda a cadeia de
+      infraestrutura de telecomunicações — desde o planejamento e instalação de redes
+      de fibra óptica até a manutenção preventiva e corretiva de equipamentos.
+    </p>
+    <p class="about-text">
+      Atuo em campo realizando emendas de fibra óptica com fusão, instalação de cabos
+      estruturados, configuração de roteadores, switches e ONTs, além de testes com
+      equipamentos como OTDR e power meter. Meu objetivo é entregar conexões estáveis,
+      rápidas e confiáveis para residências e empresas.
+    </p>
+    <p class="about-text">
+      Acredito que a telecomunicação é a espinha dorsal do mundo moderno — e meu papel
+      é garantir que essa estrutura funcione perfeitamente, todos os dias.
+    </p>
+  </section>
+
+  <!-- SERVIÇOS -->
+  <section id="servicos">
+    <h2 class="section-title">O que eu <span>faço</span></h2>
+    <div class="section-line"></div>
+    <div class="services-grid">
+      <div class="service-card">
+        <div class="service-icon">&#128268;</div>
+        <h3>Fibra Óptica</h3>
+        <p>Instalação, emenda por fusão, testes com OTDR e certificação de enlaces ópticos para redes FTTx.</p>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">&#127760;</div>
+        <h3>Redes e Internet</h3>
+        <p>Configuração de roteadores, switches, ONTs e access points. Cabeamento estruturado Cat5e/Cat6.</p>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">&#128225;</div>
+        <h3>Telefonia</h3>
+        <p>Instalação e manutenção de linhas telefônicas convencionais e VoIP, centrais PABX e ramais.</p>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">&#128295;</div>
+        <h3>Manutenção Preventiva</h3>
+        <p>Diagnóstico e reparo de falhas em redes, substituição de equipamentos e otimização de sinal.</p>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">&#128225;</div>
+        <h3>CFTV e Segurança</h3>
+        <p>Instalação de câmeras IP, DVRs/NVRs e infraestrutura de cabeamento para sistemas de vigilância.</p>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">&#128202;</div>
+        <h3>Projetos e Laudos</h3>
+        <p>Elaboração de projetos de rede, levantamento de infraestrutura e documentação técnica.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- HABILIDADES -->
+  <section id="habilidades">
+    <h2 class="section-title">Minhas <span>habilidades</span></h2>
+    <div class="section-line"></div>
+    <div class="skills-list">
+      <span class="skill-tag">Fibra Óptica (FTTH/FTTB)</span>
+      <span class="skill-tag">Fusão de Fibra</span>
+      <span class="skill-tag">OTDR</span>
+      <span class="skill-tag">Power Meter</span>
+      <span class="skill-tag">Cabeamento Estruturado</span>
+      <span class="skill-tag">Redes TCP/IP</span>
+      <span class="skill-tag">Roteadores e Switches</span>
+      <span class="skill-tag">ONT / OLT</span>
+      <span class="skill-tag">Wi-Fi e Access Points</span>
+      <span class="skill-tag">VoIP / PABX</span>
+      <span class="skill-tag">CFTV / Câmeras IP</span>
+      <span class="skill-tag">Mikrotik</span>
+      <span class="skill-tag">Huawei</span>
+      <span class="skill-tag">Datacom</span>
+      <span class="skill-tag">Leitura de Projetos</span>
+      <span class="skill-tag">Trabalho em Altura</span>
+      <span class="skill-tag">NR-10 / NR-35</span>
+      <span class="skill-tag">Atendimento ao Cliente</span>
+    </div>
+  </section>
+
+  <!-- EXPERIÊNCIA -->
+  <section id="experiencia">
+    <h2 class="section-title">Minha <span>trajetória</span></h2>
+    <div class="section-line"></div>
+    <div class="timeline">
+      <div class="timeline-item">
+        <div class="period">ATUAL</div>
+        <h3>Técnico de Telecomunicações</h3>
+        <p>
+          Atuação em campo com instalação e manutenção de redes de fibra óptica,
+          configuração de equipamentos de rede, atendimento a clientes residenciais
+          e corporativos, diagnóstico e resolução de falhas em enlaces ópticos.
+        </p>
+      </div>
+      <div class="timeline-item">
+        <div class="period">FORMAÇÃO</div>
+        <h3>Curso Técnico em Telecomunicações</h3>
+        <p>
+          Formação técnica com foco em sistemas de telecomunicações, redes de dados,
+          infraestrutura óptica, eletrônica aplicada e normas regulatórias do setor.
+        </p>
+      </div>
+      <div class="timeline-item">
+        <div class="period">CERTIFICAÇÕES</div>
+        <h3>NR-10 · NR-35 · Fibra Óptica</h3>
+        <p>
+          Certificações de segurança para trabalho com eletricidade e em altura,
+          além de capacitação técnica em emenda e medição de fibra óptica.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTATO -->
+  <section id="contato" class="contact-section">
+    <h2 class="section-title">Entre em <span>contato</span></h2>
+    <div class="section-line"></div>
+    <p class="contact-text">
+      Precisa de um profissional de telecomunicações?<br>
+      Estou disponível para novos projetos e oportunidades.
+    </p>
+    <div class="contact-info">
+      <div class="contact-card">
+        <div class="label">E-mail</div>
+        <div class="value">lualker@email.com</div>
+      </div>
+      <div class="contact-card">
+        <div class="label">Telefone</div>
+        <div class="value">(00) 00000-0000</div>
+      </div>
+      <div class="contact-card">
+        <div class="label">Localização</div>
+        <div class="value">Brasil</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    &copy; 2026 Lualker — Todos os direitos reservados.
+  </footer>
+
+  <script>
+    // Navbar scroll effect
+    window.addEventListener('scroll', () => {
+      document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 50);
+    });
+
+    // Smooth scroll
+    document.querySelectorAll('a[href^="#"]').forEach(a => {
+      a.addEventListener('click', e => {
+        e.preventDefault();
+        const target = document.querySelector(a.getAttribute('href'));
+        if (target) target.scrollIntoView({ behavior: 'smooth' });
+      });
+    });
+  </script>
+</body>
+</html>

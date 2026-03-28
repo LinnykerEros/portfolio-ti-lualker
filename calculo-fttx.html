@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lualker - Cálculo de Potência FTTX</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #0f0f0f;
+      color: #d0d0d0;
+      line-height: 1.7;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: 16px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(15,15,15,0.9);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid #1a1a1a;
+    }
+
+    nav .logo {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #7c5cfc;
+      letter-spacing: 2px;
+      text-decoration: none;
+    }
+
+    nav .nav-links { display: flex; gap: 20px; }
+
+    nav .nav-links a {
+      text-decoration: none;
+      color: #666;
+      font-size: 0.85rem;
+      transition: color 0.2s;
+    }
+
+    nav .nav-links a:hover { color: #fff; }
+
+    /* HERO BANNER */
+    .hero-banner {
+      padding: 120px 20px 60px;
+      text-align: center;
+      background:
+        radial-gradient(ellipse at 40% 50%, rgba(124,92,252,0.07) 0%, transparent 60%),
+        radial-gradient(ellipse at 60% 60%, rgba(56,189,248,0.05) 0%, transparent 50%);
+    }
+
+    .hero-banner h1 {
+      font-size: 2.2rem;
+      font-weight: 300;
+      color: #fff;
+      margin-bottom: 10px;
+    }
+
+    .hero-banner h1 span { color: #7c5cfc; font-weight: 600; }
+
+    .hero-banner p {
+      color: #777;
+      font-size: 1rem;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    /* CONTENT */
+    .content {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 40px 20px 100px;
+    }
+
+    /* SECTION */
+    .section {
+      margin-bottom: 60px;
+    }
+
+    .section h2 {
+      font-size: 1.4rem;
+      font-weight: 300;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+
+    .section h2 span { color: #7c5cfc; font-weight: 600; }
+
+    .section-line {
+      width: 40px;
+      height: 3px;
+      background: #7c5cfc;
+      border-radius: 2px;
+      margin-bottom: 24px;
+    }
+
+    .section h3 {
+      font-size: 1.05rem;
+      color: #e0e0e0;
+      margin: 24px 0 12px;
+      font-weight: 600;
+    }
+
+    .section p, .section li {
+      font-size: 0.92rem;
+      color: #aaa;
+      line-height: 1.8;
+    }
+
+    .section ul {
+      padding-left: 20px;
+      margin-bottom: 16px;
+    }
+
+    .section li { margin-bottom: 4px; }
+
+    .section strong { color: #d0d0d0; }
+
+    /* FORMULA BOX */
+    .formula {
+      background: #1a1a1a;
+      border-left: 3px solid #7c5cfc;
+      padding: 18px 22px;
+      border-radius: 0 10px 10px 0;
+      margin: 16px 0;
+      font-family: 'Consolas', 'Courier New', monospace;
+      font-size: 0.9rem;
+      color: #ccc;
+      overflow-x: auto;
+    }
+
+    .formula .highlight { color: #7c5cfc; font-weight: 600; }
+    .formula .comment { color: #555; }
+
+    /* TABLE */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0;
+      font-size: 0.88rem;
+    }
+
+    .data-table thead th {
+      background: #1a1a1a;
+      color: #7c5cfc;
+      font-weight: 600;
+      text-align: left;
+      padding: 12px 16px;
+      font-size: 0.8rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      border-bottom: 2px solid #252525;
+    }
+
+    .data-table tbody td {
+      padding: 10px 16px;
+      border-bottom: 1px solid #1a1a1a;
+      color: #bbb;
+    }
+
+    .data-table tbody tr:hover { background: #141414; }
+
+    .data-table .val { color: #38bdf8; font-weight: 500; font-family: 'Consolas', monospace; }
+    .data-table .ok { color: #4ade80; }
+    .data-table .warn { color: #facc15; }
+    .data-table .bad { color: #f87171; }
+
+    /* CARD GRID */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 14px;
+      margin: 16px 0;
+    }
+
+    .card {
+      background: #1a1a1a;
+      border: 1px solid #1f1f1f;
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      transition: border-color 0.3s;
+    }
+
+    .card:hover { border-color: #7c5cfc; }
+
+    .card .card-value {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #7c5cfc;
+      margin-bottom: 4px;
+      font-family: 'Consolas', monospace;
+    }
+
+    .card .card-label {
+      font-size: 0.78rem;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    /* EXAMPLE BOX */
+    .example-box {
+      background: #141414;
+      border: 1px solid #1f1f1f;
+      border-radius: 12px;
+      padding: 24px;
+      margin: 20px 0;
+    }
+
+    .example-box .title {
+      font-size: 0.82rem;
+      color: #7c5cfc;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 16px;
+      font-weight: 600;
+    }
+
+    .calc-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid #1a1a1a;
+      font-size: 0.88rem;
+    }
+
+    .calc-row:last-child { border-bottom: none; }
+    .calc-row .label { color: #888; }
+    .calc-row .value { color: #38bdf8; font-family: 'Consolas', monospace; font-weight: 500; }
+    .calc-row.total { border-top: 2px solid #7c5cfc; margin-top: 6px; padding-top: 12px; }
+    .calc-row.total .label { color: #fff; font-weight: 600; }
+    .calc-row.total .value { color: #7c5cfc; font-weight: 700; font-size: 1rem; }
+    .calc-row.result .value.ok { color: #4ade80; }
+    .calc-row.result .value.warn { color: #facc15; }
+
+    /* SIGNAL LEVEL BAR */
+    .signal-bar {
+      display: flex;
+      height: 30px;
+      border-radius: 8px;
+      overflow: hidden;
+      margin: 16px 0 8px;
+    }
+
+    .signal-bar div {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    .sig-excellent { background: #4ade80; color: #0f0f0f; flex: 7; }
+    .sig-good { background: #38bdf8; color: #0f0f0f; flex: 7; }
+    .sig-acceptable { background: #facc15; color: #0f0f0f; flex: 3; }
+    .sig-marginal { background: #fb923c; color: #0f0f0f; flex: 2; }
+    .sig-limit { background: #f87171; color: #fff; flex: 1; }
+
+    .signal-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.7rem;
+      color: #555;
+      font-family: 'Consolas', monospace;
+    }
+
+    /* TOOL CARD */
+    .tool-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 14px;
+      margin: 16px 0;
+    }
+
+    .tool-card {
+      background: #1a1a1a;
+      border: 1px solid #1f1f1f;
+      border-radius: 12px;
+      padding: 22px;
+      transition: border-color 0.3s;
+    }
+
+    .tool-card:hover { border-color: #7c5cfc; }
+
+    .tool-card .tool-icon { font-size: 1.6rem; margin-bottom: 10px; }
+
+    .tool-card h4 {
+      font-size: 0.95rem;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+
+    .tool-card p {
+      font-size: 0.82rem;
+      color: #666;
+      line-height: 1.6;
+    }
+
+    /* BADGE */
+    .badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    .badge-gpon { background: rgba(124,92,252,0.15); color: #7c5cfc; }
+    .badge-xgs { background: rgba(56,189,248,0.15); color: #38bdf8; }
+    .badge-epon { background: rgba(74,222,128,0.15); color: #4ade80; }
+
+    /* TOC */
+    .toc {
+      background: #1a1a1a;
+      border-radius: 12px;
+      padding: 24px 28px;
+      margin-bottom: 50px;
+    }
+
+    .toc h3 {
+      font-size: 0.82rem;
+      color: #555;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 14px;
+    }
+
+    .toc ol {
+      padding-left: 18px;
+      list-style: decimal;
+    }
+
+    .toc li { margin-bottom: 6px; }
+
+    .toc a {
+      color: #888;
+      text-decoration: none;
+      font-size: 0.88rem;
+      transition: color 0.2s;
+    }
+
+    .toc a:hover { color: #7c5cfc; }
+
+    /* FOOTER */
+    footer {
+      text-align: center;
+      padding: 30px 20px;
+      border-top: 1px solid #1a1a1a;
+      font-size: 0.78rem;
+      color: #333;
+    }
+
+    footer a { color: #7c5cfc; text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+
+    @media (max-width: 600px) {
+      .hero-banner h1 { font-size: 1.6rem; }
+      nav .nav-links { gap: 12px; }
+      nav .nav-links a { font-size: 0.75rem; }
+      .signal-bar div { font-size: 0.55rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a href="portfolio.html" class="logo">lualker</a>
+    <div class="nav-links">
+      <a href="portfolio.html">Portfólio</a>
+      <a href="#fundamentos">Fundamentos</a>
+      <a href="#perdas">Perdas</a>
+      <a href="#exemplo">Exemplo</a>
+      <a href="#ferramentas">Ferramentas</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <div class="hero-banner">
+    <h1>Cálculo de Potência <span>FTTX</span></h1>
+    <p>Guia técnico completo sobre orçamento de potência óptica em redes FTTH/FTTB/FTTC — por Lualker, Técnico de Telecomunicações.</p>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- TOC -->
+    <div class="toc">
+      <h3>Índice</h3>
+      <ol>
+        <li><a href="#fundamentos">O que é Power Budget</a></li>
+        <li><a href="#formulas">Fórmulas Principais</a></li>
+        <li><a href="#perdas">Tabelas de Atenuação</a></li>
+        <li><a href="#padroes">Padrões GPON / XGS-PON / EPON</a></li>
+        <li><a href="#niveis">Níveis de Sinal Aceitáveis</a></li>
+        <li><a href="#exemplo">Exemplo de Cálculo Completo</a></li>
+        <li><a href="#margem">Margem de Enlace</a></li>
+        <li><a href="#ferramentas">Ferramentas de Medição</a></li>
+        <li><a href="#referencia">Tabela de Referência Rápida</a></li>
+      </ol>
+    </div>
+
+    <!-- 1. FUNDAMENTOS -->
+    <div class="section" id="fundamentos">
+      <h2>O que é <span>Power Budget</span></h2>
+      <div class="section-line"></div>
+      <p>O <strong>Power Budget</strong> (Orçamento de Potência Óptica) é a perda óptica máxima permitida entre o transmissor da OLT e o receptor da ONT/ONU em uma rede óptica passiva (PON). Ele determina o alcance máximo e a razão de divisão (split) da rede.</p>
+
+      <div class="card-grid" style="margin-top: 20px;">
+        <div class="card">
+          <div class="card-value">28 dB</div>
+          <div class="card-label">GPON Classe B+</div>
+        </div>
+        <div class="card">
+          <div class="card-value">32 dB</div>
+          <div class="card-label">GPON Classe C+</div>
+        </div>
+        <div class="card">
+          <div class="card-value">29 dB</div>
+          <div class="card-label">XGS-PON N1</div>
+        </div>
+        <div class="card">
+          <div class="card-value">24 dB</div>
+          <div class="card-label">EPON PX20</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. FÓRMULAS -->
+    <div class="section" id="formulas">
+      <h2>Fórmulas <span>Principais</span></h2>
+      <div class="section-line"></div>
+
+      <h3>Power Budget</h3>
+      <div class="formula">
+        <span class="highlight">Power Budget (dB)</span> = P<sub>tx OLT</sub> (dBm) − P<sub>rx min ONT</sub> (dBm)
+      </div>
+
+      <h3>Atenuação Total do Enlace</h3>
+      <div class="formula">
+        <span class="highlight">A<sub>total</sub></span> = (L × α<sub>f</sub>) + (N<sub>e</sub> × A<sub>e</sub>) + (N<sub>c</sub> × A<sub>c</sub>) + (N<sub>s</sub> × A<sub>s</sub>) + A<sub>splitter</sub> + M
+        <br><br>
+        <span class="comment">Onde:</span><br>
+        L &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= comprimento da fibra (km)<br>
+        α<sub>f</sub> &nbsp;&nbsp;&nbsp;= coeficiente de atenuação da fibra (dB/km)<br>
+        N<sub>e</sub> &nbsp;&nbsp;&nbsp;= número de emendas por fusão<br>
+        A<sub>e</sub> &nbsp;&nbsp;&nbsp;= perda por emenda (dB)<br>
+        N<sub>c</sub> &nbsp;&nbsp;&nbsp;= número de conectores<br>
+        A<sub>c</sub> &nbsp;&nbsp;&nbsp;= perda por conector (dB)<br>
+        N<sub>s</sub> &nbsp;&nbsp;&nbsp;= número de splitters<br>
+        A<sub>s</sub> &nbsp;&nbsp;&nbsp;= perda por splitter (dB)<br>
+        M &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= margem do sistema (dB)
+      </div>
+
+      <h3>Condição de Viabilidade</h3>
+      <div class="formula">
+        <span class="highlight">P<sub>tx OLT</sub> − A<sub>total</sub> ≥ Sensibilidade ONT</span>
+        <br><br>
+        <span class="comment">Se o resultado for verdadeiro → enlace viável</span>
+      </div>
+    </div>
+
+    <!-- 3. TABELAS DE ATENUAÇÃO -->
+    <div class="section" id="perdas">
+      <h2>Tabelas de <span>Atenuação</span></h2>
+      <div class="section-line"></div>
+
+      <h3>Atenuação da Fibra Óptica (Monomodo G.652.D)</h3>
+      <table class="data-table">
+        <thead>
+          <tr><th>Comprimento de Onda</th><th>Atenuação</th><th>Uso</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>1310 nm</td><td class="val">0,35 dB/km</td><td>Upstream</td></tr>
+          <tr><td>1490 nm</td><td class="val">0,25 dB/km</td><td>Downstream GPON</td></tr>
+          <tr><td>1550 nm</td><td class="val">0,20 dB/km</td><td>Downstream / Vídeo RF</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Perda em Splitters (Divisores Ópticos)</h3>
+      <table class="data-table">
+        <thead>
+          <tr><th>Razão</th><th>Perda Teórica</th><th>Perda Real Típica</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>1:2</td><td>3,0 dB</td><td class="val">3,2 – 3,8 dB</td></tr>
+          <tr><td>1:4</td><td>6,0 dB</td><td class="val">6,5 – 7,2 dB</td></tr>
+          <tr><td>1:8</td><td>9,0 dB</td><td class="val">9,5 – 10,5 dB</td></tr>
+          <tr><td>1:16</td><td>12,0 dB</td><td class="val">12,5 – 13,5 dB</td></tr>
+          <tr><td>1:32</td><td>15,0 dB</td><td class="val">15,5 – 17,0 dB</td></tr>
+          <tr><td>1:64</td><td>18,0 dB</td><td class="val">18,5 – 21,0 dB</td></tr>
+          <tr><td>1:128</td><td>21,0 dB</td><td class="val">22,0 – 24,0 dB</td></tr>
+        </tbody>
+      </table>
+      <p style="font-size:0.8rem; color:#555; margin-top:6px;">Perda teórica mínima = 10 × log<sub>10</sub>(N), onde N = número de saídas.</p>
+
+      <h3>Perda em Conectores</h3>
+      <table class="data-table">
+        <thead>
+          <tr><th>Tipo de Conector</th><th>Perda Típica</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>SC/APC (angular)</td><td class="val">0,25 – 0,50 dB</td></tr>
+          <tr><td>SC/UPC</td><td class="val">0,30 – 0,50 dB</td></tr>
+          <tr><td>LC/APC</td><td class="val">0,20 – 0,50 dB</td></tr>
+          <tr><td>Conectorizado em fábrica</td><td class="val">0,20 – 0,30 dB</td></tr>
+          <tr><td>Conector mecânico (campo)</td><td class="val">0,30 – 0,75 dB</td></tr>
+        </tbody>
+      </table>
+      <p style="font-size:0.8rem; color:#555; margin-top:6px;">Valor padrão de projeto: <strong style="color:#38bdf8;">0,5 dB</strong> por par conectado.</p>
+
+      <h3>Perda em Emendas por Fusão</h3>
+      <table class="data-table">
+        <thead>
+          <tr><th>Tipo de Máquina</th><th>Perda Típica</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Alinhamento por núcleo (core)</td><td class="val">0,02 – 0,05 dB</td></tr>
+          <tr><td>Alinhamento por casca (cladding)</td><td class="val">0,05 – 0,10 dB</td></tr>
+          <tr><td><strong>Valor padrão de projeto</strong></td><td class="val" style="color:#facc15;">0,10 dB</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Perda por Curvatura</h3>
+      <table class="data-table">
+        <thead>
+          <tr><th>Condição</th><th>Perda</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Curvatura dentro da especificação</td><td class="val">0,01 – 0,05 dB</td></tr>
+          <tr><td>Fibra G.657.A2 (raio 15mm)</td><td class="val">~0,0 dB</td></tr>
+          <tr><td>Curvatura acentuada (abaixo do raio mín.)</td><td class="val bad">0,5 – vários dB</td></tr>
+          <tr><td><strong>Reserva de projeto (total)</strong></td><td class="val">0,5 – 1,0 dB</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 4. PADRÕES -->
+    <div class="section" id="padroes">
+      <h2>Padrões <span>PON</span></h2>
+      <div class="section-line"></div>
+
+      <h3><span class="badge badge-gpon">GPON</span> Classe B+ (ITU-T G.984.2)</h3>
+      <table class="data-table">
+        <thead>
+          <tr><th>Parâmetro</th><th>Valor</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Potência Tx OLT</td><td class="val">+1,5 a +5,0 dBm</td></tr>
+          <tr><td>Potência Tx ONT</td><td class="val">+0,5 a +5,0 dBm</td></tr>
+          <tr><td>Sensibilidade Rx OLT</td><td class="val">−28,0 dBm</td></tr>
+          <tr><td>Sensibilidade Rx ONT</td><td class="val">−28,0 dBm</td></tr>
+          <tr><td>Overload ONT</td><td class="val">−8,0 dBm</td></tr>
+          <tr><td><strong>Power Budget</strong></td><td class="val" style="color:#7c5cfc; font-size:1rem;">28 dB</td></tr>
+        </tbody>
+      </table>
+
+      <h3><span class="badge badge-gpon">GPON</span> Classe C+</h3>
+      <table class="data-table">
+        <thead>
+          <tr><th>Parâmetro</th><th>Valor</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Potência Tx OLT</td><td class="val">+3,0 a +7,0 dBm</td></tr>
+          <tr><td>Sensibilidade Rx ONT</td><td class="val">−32,0 dBm</td></tr>
+          <tr><td>Overload ONT</td><td class="val">−12,0 dBm</td></tr>
+          <tr><td><strong>Power Budget</strong></td><td class="val" style="color:#7c5cfc; font-size:1rem;">32 dB</td></tr>
+        </tbody>
+      </table>
+
+      <h3><span class="badge badge-xgs">XGS-PON</span> (ITU-T G.9807.1)</h3>
+      <table class="data-table">
+        <thead>
+          <tr><th>Parâmetro</th><th>Classe N1</th><th>Classe N2</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Potência Tx OLT</td><td class="val">+2 a +6 dBm</td><td class="val">+4 a +8 dBm</td></tr>
+          <tr><td>Sensibilidade ONT</td><td class="val">−28,0 dBm</td><td class="val">−28,0 dBm</td></tr>
+          <tr><td><strong>Power Budget</strong></td><td class="val">29 dB</td><td class="val">31 dB</td></tr>
+        </tbody>
+      </table>
+
+      <h3><span class="badge badge-epon">EPON</span> PX20 (IEEE 802.3ah)</h3>
+      <table class="data-table">
+        <thead>
+          <tr><th>Parâmetro</th><th>Valor</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Potência Tx OLT</td><td class="val">+2 a +7 dBm</td></tr>
+          <tr><td>Sensibilidade ONT</td><td class="val">−27,0 dBm</td></tr>
+          <tr><td><strong>Power Budget</strong></td><td class="val" style="color:#4ade80; font-size:1rem;">24 dB</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Potência Típica de OLTs Comerciais</h3>
+      <table class="data-table">
+        <thead>
+          <tr><th>Fabricante / Padrão</th><th>Tx Downstream</th><th>Comprimento de Onda</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>GPON B+</td><td class="val">+1,5 a +5,0 dBm</td><td>1490 nm</td></tr>
+          <tr><td>GPON C+</td><td class="val">+3,0 a +7,0 dBm</td><td>1490 nm</td></tr>
+          <tr><td>Huawei OLT (típico)</td><td class="val">+3,0 a +5,0 dBm</td><td>1490 nm</td></tr>
+          <tr><td>ZTE OLT (típico)</td><td class="val">+2,5 a +5,0 dBm</td><td>1490 nm</td></tr>
+          <tr><td>XGS-PON N2</td><td class="val">+4,0 a +8,0 dBm</td><td>1577 nm</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 5. NÍVEIS DE SINAL -->
+    <div class="section" id="niveis">
+      <h2>Níveis de Sinal <span>Aceitáveis</span></h2>
+      <div class="section-line"></div>
+
+      <p>Potência óptica recebida na ONT — classificação operacional:</p>
+
+      <div class="signal-bar">
+        <div class="sig-excellent">EXCELENTE</div>
+        <div class="sig-good">BOM</div>
+        <div class="sig-acceptable">ACEITÁVEL</div>
+        <div class="sig-marginal">MARGINAL</div>
+        <div class="sig-limit">!</div>
+      </div>
+      <div class="signal-labels">
+        <span>−8 dBm</span>
+        <span>−15 dBm</span>
+        <span>−22 dBm</span>
+        <span>−25 dBm</span>
+        <span>−28 dBm</span>
+      </div>
+
+      <table class="data-table" style="margin-top: 20px;">
+        <thead>
+          <tr><th>Classificação</th><th>Faixa de Potência</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Excelente</td><td class="val">−8 a −15 dBm</td><td class="ok">&#9679; Ótimo</td></tr>
+          <tr><td>Bom</td><td class="val">−15 a −22 dBm</td><td class="ok">&#9679; Normal</td></tr>
+          <tr><td>Aceitável</td><td class="val">−22 a −25 dBm</td><td class="warn">&#9679; Atenção</td></tr>
+          <tr><td>Marginal</td><td class="val">−25 a −27 dBm</td><td class="warn">&#9679; Risco</td></tr>
+          <tr><td>Limite (B+)</td><td class="val">−28 dBm</td><td class="bad">&#9679; Limite</td></tr>
+          <tr><td>Sem sinal</td><td class="val">&lt; −28 dBm</td><td class="bad">&#9679; Inoperante</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 6. EXEMPLO -->
+    <div class="section" id="exemplo">
+      <h2>Exemplo de <span>Cálculo Completo</span></h2>
+      <div class="section-line"></div>
+
+      <h3>Cenário</h3>
+      <ul>
+        <li>Padrão: <strong>GPON Classe B+</strong> (Power Budget = 28 dB)</li>
+        <li>Potência Tx OLT: <strong>+4,0 dBm</strong></li>
+        <li>Distância total OLT → ONT: <strong>12 km</strong></li>
+        <li>Topologia: OLT → Splitter 1:8 (2 km) → Splitter 1:8 (8 km) → ONT (12 km)</li>
+        <li>4 conectores (pares) · 6 emendas por fusão</li>
+        <li>Comprimento de onda: <strong>1490 nm</strong> (downstream)</li>
+      </ul>
+
+      <div class="example-box">
+        <div class="title">Cálculo — Cenário 1 (Split 1:64)</div>
+        <div class="calc-row">
+          <span class="label">Fibra (12 km × 0,25 dB/km)</span>
+          <span class="value">3,00 dB</span>
+        </div>
+        <div class="calc-row">
+          <span class="label">1° Splitter 1:8</span>
+          <span class="value">10,50 dB</span>
+        </div>
+        <div class="calc-row">
+          <span class="label">2° Splitter 1:8</span>
+          <span class="value">10,50 dB</span>
+        </div>
+        <div class="calc-row">
+          <span class="label">Conectores (4 × 0,50 dB)</span>
+          <span class="value">2,00 dB</span>
+        </div>
+        <div class="calc-row">
+          <span class="label">Emendas fusão (6 × 0,10 dB)</span>
+          <span class="value">0,60 dB</span>
+        </div>
+        <div class="calc-row">
+          <span class="label">Reserva curvaturas</span>
+          <span class="value">0,50 dB</span>
+        </div>
+        <div class="calc-row total">
+          <span class="label">Atenuação Total do Enlace</span>
+          <span class="value">27,10 dB</span>
+        </div>
+        <div class="calc-row result">
+          <span class="label">Sinal na ONT = +4,0 − 27,10</span>
+          <span class="value warn">−23,10 dBm</span>
+        </div>
+        <div class="calc-row result">
+          <span class="label">Margem restante = 28 − 27,10</span>
+          <span class="value warn">0,9 dB ⚠️ Abaixo de 3 dB</span>
+        </div>
+      </div>
+
+      <p style="color:#facc15; font-size:0.88rem; margin: 10px 0;">O enlace funciona, mas a margem de 0,9 dB é insuficiente. Recomenda-se usar óptica <strong>Classe C+</strong> ou reduzir o split.</p>
+
+      <div class="example-box">
+        <div class="title">Redesign — Cenário 2 (Split 1:32)</div>
+        <div class="calc-row">
+          <span class="label">Fibra (12 km × 0,25 dB/km)</span>
+          <span class="value">3,00 dB</span>
+        </div>
+        <div class="calc-row">
+          <span class="label">1° Splitter 1:4</span>
+          <span class="value">7,00 dB</span>
+        </div>
+        <div class="calc-row">
+          <span class="label">2° Splitter 1:8</span>
+          <span class="value">10,50 dB</span>
+        </div>
+        <div class="calc-row">
+          <span class="label">Conectores (4 × 0,50 dB)</span>
+          <span class="value">2,00 dB</span>
+        </div>
+        <div class="calc-row">
+          <span class="label">Emendas fusão (6 × 0,10 dB)</span>
+          <span class="value">0,60 dB</span>
+        </div>
+        <div class="calc-row">
+          <span class="label">Reserva curvaturas</span>
+          <span class="value">0,50 dB</span>
+        </div>
+        <div class="calc-row total">
+          <span class="label">Atenuação Total do Enlace</span>
+          <span class="value">23,60 dB</span>
+        </div>
+        <div class="calc-row result">
+          <span class="label">Sinal na ONT = +4,0 − 23,60</span>
+          <span class="value ok">−19,60 dBm ✓ Bom</span>
+        </div>
+        <div class="calc-row result">
+          <span class="label">Margem restante = 28 − 23,60</span>
+          <span class="value ok">4,4 dB ✓ Adequada</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 7. MARGEM -->
+    <div class="section" id="margem">
+      <h2>Margem de <span>Enlace</span></h2>
+      <div class="section-line"></div>
+
+      <p>A margem de enlace é a reserva de potência para compensar:</p>
+      <ul>
+        <li>Envelhecimento e degradação da fibra ao longo dos anos</li>
+        <li>Variações de temperatura no ambiente</li>
+        <li>Degradação dos componentes ópticos</li>
+        <li>Emendas futuras para reparo</li>
+        <li>Incerteza de medição</li>
+      </ul>
+
+      <table class="data-table" style="margin-top: 16px;">
+        <thead>
+          <tr><th>Aplicação</th><th>Margem Recomendada</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Mínimo aceitável</td><td class="val warn">1,0 dB</td></tr>
+          <tr><td><strong>Recomendação padrão</strong></td><td class="val ok" style="font-size:1rem;">3,0 dB</td></tr>
+          <tr><td>Conservador / longa vida</td><td class="val">5,0 dB</td></tr>
+          <tr><td>Redes com possíveis reparos</td><td class="val">3,0 – 5,0 dB</td></tr>
+        </tbody>
+      </table>
+
+      <p style="font-size:0.85rem; color:#666; margin-top:10px;">A maioria das operadoras brasileiras (Vivo, Claro, Oi) e internacionais exige margem mínima de <strong style="color:#4ade80;">3 dB</strong> em seus projetos.</p>
+    </div>
+
+    <!-- 8. FERRAMENTAS -->
+    <div class="section" id="ferramentas">
+      <h2>Ferramentas de <span>Medição</span></h2>
+      <div class="section-line"></div>
+
+      <div class="tool-grid">
+        <div class="tool-card">
+          <div class="tool-icon">&#128300;</div>
+          <h4>OTDR</h4>
+          <p><strong>Reflectômetro Óptico no Domínio do Tempo</strong> — Mapeia toda a fibra, mostrando perdas em cada ponto (emendas, conectores, curvaturas) e localiza falhas com precisão.<br><br>
+          <strong>Faixa dinâmica:</strong> 28–45 dB<br>
+          <strong>Zona morta:</strong> 0,8–3 m<br>
+          <strong>Marcas:</strong> EXFO, VIAVI, Yokogawa, Anritsu</p>
+        </div>
+        <div class="tool-card">
+          <div class="tool-icon">&#128207;</div>
+          <h4>Power Meter</h4>
+          <p><strong>Medidor de Potência Óptica</strong> — Mede a potência absoluta (dBm) em qualquer ponto da rede. Essencial para verificar o sinal na ONT.<br><br>
+          <strong>Faixa:</strong> −70 a +10 dBm<br>
+          <strong>Precisão:</strong> ±0,25 dB<br>
+          <strong>Resolução:</strong> 0,01 dB</p>
+        </div>
+        <div class="tool-card">
+          <div class="tool-icon">&#128308;</div>
+          <h4>VFL</h4>
+          <p><strong>Localizador Visual de Falhas</strong> — Laser vermelho (635 nm) visível através da fibra. Identifica quebras, curvaturas acentuadas e emendas ruins.<br><br>
+          <strong>Alcance:</strong> 5–15 km<br>
+          <strong>Uso:</strong> Localização rápida de falhas visíveis</p>
+        </div>
+        <div class="tool-card">
+          <div class="tool-icon">&#128161;</div>
+          <h4>OLS</h4>
+          <p><strong>Fonte de Luz Óptica</strong> — Usada em par com o Power Meter para medir perda de inserção ponta a ponta (método bidirecional).<br><br>
+          <strong>Potência:</strong> −7 a 0 dBm<br>
+          <strong>Lambdas:</strong> 1310/1490/1550 nm</p>
+        </div>
+      </div>
+
+      <h3>Procedimento de Aceitação FTTH</h3>
+      <ol style="padding-left:20px; margin-top:10px;">
+        <li style="margin-bottom:8px;"><strong>Traço OTDR</strong> pelo lado da OLT em 1310 nm e 1550 nm</li>
+        <li style="margin-bottom:8px;"><strong>Perda ponta a ponta</strong> com OLS + Power Meter (bidirecional 1310/1550 nm)</li>
+        <li style="margin-bottom:8px;"><strong>ORL</strong> (Perda de Retorno Óptica) — deve ser &gt; 32 dB para conectores APC</li>
+        <li style="margin-bottom:8px;"><strong>Nível de sinal na ONT</strong> com Power Meter — ideal entre −8 e −25 dBm</li>
+      </ol>
+    </div>
+
+    <!-- 9. REFERÊNCIA RÁPIDA -->
+    <div class="section" id="referencia">
+      <h2>Tabela de <span>Referência Rápida</span></h2>
+      <div class="section-line"></div>
+
+      <table class="data-table">
+        <thead>
+          <tr><th>Parâmetro</th><th>Valor</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Fibra 1310 nm</td><td class="val">0,35 dB/km</td></tr>
+          <tr><td>Fibra 1490 nm</td><td class="val">0,25 dB/km</td></tr>
+          <tr><td>Fibra 1550 nm</td><td class="val">0,20 dB/km</td></tr>
+          <tr><td>Emenda por fusão</td><td class="val">0,10 dB</td></tr>
+          <tr><td>Conector (par)</td><td class="val">0,50 dB</td></tr>
+          <tr><td>Splitter 1:2</td><td class="val">3,5 dB</td></tr>
+          <tr><td>Splitter 1:4</td><td class="val">7,0 dB</td></tr>
+          <tr><td>Splitter 1:8</td><td class="val">10,5 dB</td></tr>
+          <tr><td>Splitter 1:16</td><td class="val">13,5 dB</td></tr>
+          <tr><td>Splitter 1:32</td><td class="val">17,0 dB</td></tr>
+          <tr><td>Splitter 1:64</td><td class="val">21,0 dB</td></tr>
+          <tr><td>GPON B+ budget</td><td class="val">28 dB</td></tr>
+          <tr><td>GPON C+ budget</td><td class="val">32 dB</td></tr>
+          <tr><td>Sensibilidade ONT (B+)</td><td class="val">−28 dBm</td></tr>
+          <tr><td>Sensibilidade ONT (C+)</td><td class="val">−32 dBm</td></tr>
+          <tr><td>Margem recomendada</td><td class="val ok">3 dB</td></tr>
+        </tbody>
+      </table>
+
+      <p style="font-size:0.8rem; color:#444; margin-top:14px;">Referências: ITU-T G.984.x (GPON) · ITU-T G.652.D / G.657.A (fibra) · ITU-T G.671 (componentes passivos) · IEEE 802.3ah (EPON)</p>
+    </div>
+
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    &copy; 2026 <a href="portfolio.html">Lualker</a> — Técnico de Telecomunicações · Guia Técnico FTTX
+  </footer>
+
+  <script>
+    // Smooth scroll
+    document.querySelectorAll('a[href^="#"]').forEach(a => {
+      a.addEventListener('click', e => {
+        e.preventDefault();
+        const target = document.querySelector(a.getAttribute('href'));
+        if (target) target.scrollIntoView({ behavior: 'smooth' });
+      });
+    });
+  </script>
+</body>
+</html>

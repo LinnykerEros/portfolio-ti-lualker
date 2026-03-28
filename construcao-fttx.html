@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lualker - Construção de Redes FTTX</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #0f0f0f;
+      color: #d0d0d0;
+      line-height: 1.7;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: 16px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(15,15,15,0.9);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid #1a1a1a;
+    }
+
+    nav .logo {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #7c5cfc;
+      letter-spacing: 2px;
+      text-decoration: none;
+    }
+
+    nav .nav-links { display: flex; gap: 20px; flex-wrap: wrap; }
+
+    nav .nav-links a {
+      text-decoration: none;
+      color: #666;
+      font-size: 0.85rem;
+      transition: color 0.2s;
+    }
+
+    nav .nav-links a:hover { color: #fff; }
+
+    /* HERO */
+    .hero-banner {
+      padding: 120px 20px 60px;
+      text-align: center;
+      background:
+        radial-gradient(ellipse at 30% 40%, rgba(124,92,252,0.07) 0%, transparent 60%),
+        radial-gradient(ellipse at 70% 60%, rgba(56,189,248,0.05) 0%, transparent 50%);
+    }
+
+    .hero-banner h1 {
+      font-size: 2.2rem;
+      font-weight: 300;
+      color: #fff;
+      margin-bottom: 10px;
+    }
+
+    .hero-banner h1 span { color: #7c5cfc; font-weight: 600; }
+
+    .hero-banner p {
+      color: #777;
+      font-size: 1rem;
+      max-width: 650px;
+      margin: 0 auto;
+    }
+
+    /* CONTENT */
+    .content {
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 40px 20px 100px;
+    }
+
+    /* TOC */
+    .toc {
+      background: #1a1a1a;
+      border-radius: 12px;
+      padding: 24px 28px;
+      margin-bottom: 50px;
+    }
+
+    .toc h3 {
+      font-size: 0.82rem;
+      color: #555;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 14px;
+    }
+
+    .toc ol { padding-left: 18px; }
+    .toc li { margin-bottom: 6px; }
+
+    .toc a {
+      color: #888;
+      text-decoration: none;
+      font-size: 0.88rem;
+      transition: color 0.2s;
+    }
+
+    .toc a:hover { color: #7c5cfc; }
+
+    /* SECTIONS */
+    .section { margin-bottom: 60px; }
+
+    .section h2 {
+      font-size: 1.4rem;
+      font-weight: 300;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+
+    .section h2 span { color: #7c5cfc; font-weight: 600; }
+
+    .section-line {
+      width: 40px;
+      height: 3px;
+      background: #7c5cfc;
+      border-radius: 2px;
+      margin-bottom: 24px;
+    }
+
+    .section h3 {
+      font-size: 1.05rem;
+      color: #e0e0e0;
+      margin: 28px 0 12px;
+      font-weight: 600;
+    }
+
+    .section h4 {
+      font-size: 0.92rem;
+      color: #ccc;
+      margin: 18px 0 8px;
+      font-weight: 600;
+    }
+
+    .section p, .section li {
+      font-size: 0.92rem;
+      color: #aaa;
+      line-height: 1.8;
+    }
+
+    .section ul, .section ol { padding-left: 20px; margin-bottom: 14px; }
+    .section li { margin-bottom: 4px; }
+    .section strong { color: #d0d0d0; }
+
+    /* TABLE */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0;
+      font-size: 0.86rem;
+    }
+
+    .data-table thead th {
+      background: #1a1a1a;
+      color: #7c5cfc;
+      font-weight: 600;
+      text-align: left;
+      padding: 12px 14px;
+      font-size: 0.78rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      border-bottom: 2px solid #252525;
+    }
+
+    .data-table tbody td {
+      padding: 10px 14px;
+      border-bottom: 1px solid #1a1a1a;
+      color: #bbb;
+    }
+
+    .data-table tbody tr:hover { background: #141414; }
+    .data-table .val { color: #38bdf8; font-weight: 500; font-family: 'Consolas', monospace; }
+    .data-table .ok { color: #4ade80; }
+    .data-table .warn { color: #facc15; }
+
+    /* CARD GRID */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+      margin: 16px 0;
+    }
+
+    .card {
+      background: #1a1a1a;
+      border: 1px solid #1f1f1f;
+      border-radius: 12px;
+      padding: 22px;
+      transition: border-color 0.3s;
+    }
+
+    .card:hover { border-color: #7c5cfc; }
+
+    .card .card-icon { font-size: 1.6rem; margin-bottom: 10px; }
+
+    .card h4 {
+      font-size: 0.95rem;
+      color: #fff;
+      margin-bottom: 6px;
+    }
+
+    .card p {
+      font-size: 0.82rem;
+      color: #666;
+      line-height: 1.6;
+    }
+
+    .card .card-tag {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 10px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      margin-top: 10px;
+    }
+
+    .tag-fiber { background: rgba(124,92,252,0.15); color: #7c5cfc; }
+    .tag-infra { background: rgba(56,189,248,0.15); color: #38bdf8; }
+    .tag-safe { background: rgba(74,222,128,0.15); color: #4ade80; }
+    .tag-tool { background: rgba(250,204,21,0.15); color: #facc15; }
+    .tag-brand { background: rgba(248,113,113,0.15); color: #f87171; }
+
+    /* INFO BOX */
+    .info-box {
+      background: #141414;
+      border-left: 3px solid #7c5cfc;
+      padding: 18px 22px;
+      border-radius: 0 10px 10px 0;
+      margin: 16px 0;
+      font-size: 0.88rem;
+      color: #aaa;
+    }
+
+    .info-box strong { color: #7c5cfc; }
+
+    /* PROCESS STEPS */
+    .steps { counter-reset: step; margin: 16px 0; }
+
+    .step {
+      position: relative;
+      padding: 16px 16px 16px 56px;
+      background: #1a1a1a;
+      border-radius: 10px;
+      margin-bottom: 8px;
+      counter-increment: step;
+    }
+
+    .step::before {
+      content: counter(step);
+      position: absolute;
+      left: 16px;
+      top: 16px;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: #7c5cfc;
+      color: #fff;
+      font-size: 0.82rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .step h4 {
+      font-size: 0.92rem;
+      color: #fff;
+      margin: 0 0 4px 0;
+    }
+
+    .step p {
+      font-size: 0.84rem;
+      color: #888;
+      margin: 0;
+      line-height: 1.6;
+    }
+
+    /* COLOR SWATCH */
+    .color-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 8px;
+      margin: 16px 0;
+    }
+
+    .color-swatch {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      background: #1a1a1a;
+      border-radius: 8px;
+      font-size: 0.82rem;
+    }
+
+    .swatch-circle {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .swatch-label { color: #aaa; }
+    .swatch-num { color: #555; font-family: 'Consolas', monospace; font-size: 0.75rem; }
+
+    /* BADGE */
+    .badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    .badge-arch { background: rgba(124,92,252,0.15); color: #7c5cfc; }
+    .badge-cable { background: rgba(56,189,248,0.15); color: #38bdf8; }
+    .badge-nr { background: rgba(248,113,113,0.15); color: #f87171; }
+
+    /* FOOTER */
+    footer {
+      text-align: center;
+      padding: 30px 20px;
+      border-top: 1px solid #1a1a1a;
+      font-size: 0.78rem;
+      color: #333;
+    }
+
+    footer a { color: #7c5cfc; text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+
+    @media (max-width: 600px) {
+      .hero-banner h1 { font-size: 1.5rem; }
+      nav .nav-links { gap: 10px; }
+      nav .nav-links a { font-size: 0.75rem; }
+      .content { padding: 30px 14px 80px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a href="portfolio.html" class="logo">lualker</a>
+    <div class="nav-links">
+      <a href="portfolio.html">Portfólio</a>
+      <a href="calculo-fttx.html">Cálculo FTTX</a>
+      <a href="#arquiteturas">Arquiteturas</a>
+      <a href="#infraestrutura">Infra</a>
+      <a href="#ceo-cto">CEO/CTO</a>
+      <a href="#seguranca">Segurança</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <div class="hero-banner">
+    <h1>Construção de Redes <span>FTTX</span></h1>
+    <p>Guia completo do especialista — da arquitetura PON à ativação do cliente. Toda a cadeia de construção de redes ópticas passivas por Lualker, Técnico de Telecomunicações.</p>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- TOC -->
+    <div class="toc">
+      <h3>Índice Completo</h3>
+      <ol>
+        <li><a href="#arquiteturas">Arquiteturas FTTX</a></li>
+        <li><a href="#pon">Arquitetura PON e Componentes</a></li>
+        <li><a href="#cabos">Tipos de Cabos Ópticos</a></li>
+        <li><a href="#codigo-cores">Código de Cores das Fibras</a></li>
+        <li><a href="#infraestrutura">Construção de Infraestrutura</a></li>
+        <li><a href="#splitters">Estratégias de Divisão (Splitters)</a></li>
+        <li><a href="#ceo-cto">CEO e CTO — Caixas de Emenda e Terminal</a></li>
+        <li><a href="#fusao">Emenda por Fusão</a></li>
+        <li><a href="#drop">Instalação de Drop (Último Trecho)</a></li>
+        <li><a href="#testes">Testes e Comissionamento</a></li>
+        <li><a href="#seguranca">Normas de Segurança e EPIs</a></li>
+        <li><a href="#documentacao">Documentação de Projeto</a></li>
+        <li><a href="#marcas">Marcas e Equipamentos do Mercado</a></li>
+        <li><a href="#boas-praticas">Boas Práticas e Qualidade</a></li>
+      </ol>
+    </div>
+
+    <!-- 1. ARQUITETURAS FTTX -->
+    <div class="section" id="arquiteturas">
+      <h2>Arquiteturas <span>FTTX</span></h2>
+      <div class="section-line"></div>
+
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-icon">&#127968;</div>
+          <h4>FTTH</h4>
+          <p>Fiber To The Home — fibra até a residência do cliente. ONT instalada dentro da casa. Modelo mais comum no Brasil desde 2018. Até <strong>10 Gbps</strong> com XGS-PON.</p>
+          <span class="card-tag tag-fiber">Mais utilizado</span>
+        </div>
+        <div class="card">
+          <div class="card-icon">&#127970;</div>
+          <h4>FTTB</h4>
+          <p>Fiber To The Building — fibra até o térreo/sala técnica do prédio. Último trecho via UTP Cat5e/Cat6. ONU no distribuidor geral. Usado em prédios antigos.</p>
+          <span class="card-tag tag-infra">Predial</span>
+        </div>
+        <div class="card">
+          <div class="card-icon">&#128722;</div>
+          <h4>FTTC</h4>
+          <p>Fiber To The Curb — fibra até um armário na calçada a ~300m do cliente. Último trecho via cobre (VDSL2, 50-100 Mbps). Tecnologia de transição.</p>
+          <span class="card-tag tag-infra">Transição</span>
+        </div>
+        <div class="card">
+          <div class="card-icon">&#127961;</div>
+          <h4>FTTN</h4>
+          <p>Fiber To The Node — fibra até o nó do bairro (1-3 km do cliente). Último trecho por cobre (ADSL2+). Legado das grandes operadoras.</p>
+          <span class="card-tag tag-infra">Legado</span>
+        </div>
+      </div>
+
+      <div class="info-box">
+        <strong>Topologia FTTH típica:</strong> OLT (POP) → Cabo Feeder → Splitter 1° nível (CEO) → Cabo Distribuição → Splitter 2° nível (CTO) → Cabo Drop → ONT (Cliente)
+      </div>
+    </div>
+
+    <!-- 2. ARQUITETURA PON -->
+    <div class="section" id="pon">
+      <h2>Arquitetura <span>PON</span> e Componentes</h2>
+      <div class="section-line"></div>
+
+      <p>Rede Óptica Passiva — <strong>nenhum equipamento ativo</strong> entre a OLT e a ONT. Toda divisão é passiva (sem energia).</p>
+
+      <h3>Componentes Principais</h3>
+
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-icon">&#128429;</div>
+          <h4>OLT</h4>
+          <p><strong>Optical Line Terminal</strong> — no POP/headend. Agrega tráfego de centenas de ONTs. Cada porta PON serve uma árvore ODN (1:64 ou 1:128).</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">&#128268;</div>
+          <h4>ODN</h4>
+          <p><strong>Optical Distribution Network</strong> — toda a planta passiva entre OLT e ONT: cabos feeder, distribuição, drop, splitters, caixas de emenda.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">&#128225;</div>
+          <h4>ONT / ONU</h4>
+          <p><strong>Optical Network Terminal</strong> — no cliente. Portas GbE, Wi-Fi, VoIP. Recebe sinal óptico e converte para elétrico.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">&#128256;</div>
+          <h4>Splitter</h4>
+          <p><strong>Divisor Óptico PLC</strong> — divide o sinal sem energia. Razões de 1:2 até 1:128. Tecnologia PLC ou FBT.</p>
+        </div>
+      </div>
+
+      <h3>Padrões PON</h3>
+      <table class="data-table">
+        <thead>
+          <tr><th>Padrão</th><th>Downstream</th><th>Upstream</th><th>Split Máx</th><th>Lambda DL/UL</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><span class="badge badge-arch">GPON</span> ITU-T G.984</td><td class="val">2,488 Gbps</td><td class="val">1,244 Gbps</td><td>1:128</td><td>1490 / 1310 nm</td></tr>
+          <tr><td><span class="badge badge-arch">EPON</span> IEEE 802.3ah</td><td class="val">1,25 Gbps</td><td class="val">1,25 Gbps</td><td>1:32</td><td>1490 / 1310 nm</td></tr>
+          <tr><td><span class="badge badge-arch">XGS-PON</span> G.9807.1</td><td class="val">10 Gbps</td><td class="val">10 Gbps</td><td>1:128</td><td>1577 / 1270 nm</td></tr>
+          <tr><td><span class="badge badge-arch">10G-EPON</span> 802.3av</td><td class="val">10 Gbps</td><td class="val">10 Gbps</td><td>1:32</td><td>1577 / 1270 nm</td></tr>
+        </tbody>
+      </table>
+
+      <div class="info-box">
+        <strong>GPON</strong> é a tecnologia dominante no Brasil. <strong>XGS-PON</strong> está em fase de implantação (2024-2026). Downstream: broadcast para todas as ONTs (1490nm). Upstream: TDMA — cada ONT transmite em slots de tempo (1310nm).
+      </div>
+
+      <h3>Segmentos da ODN</h3>
+      <table class="data-table">
+        <thead>
+          <tr><th>Segmento</th><th>Nome</th><th>Cabo Típico</th><th>Fibras</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Alimentação</td><td>Feeder</td><td>ADSS / Subterrâneo</td><td class="val">48 – 288F</td></tr>
+          <tr><td>Distribuição</td><td>Distribution</td><td>Figura-8 / ASU</td><td class="val">6 – 36F</td></tr>
+          <tr><td>Acesso</td><td>Drop</td><td>Drop flat / autossustentado</td><td class="val">1 – 2F</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 3. CABOS -->
+    <div class="section" id="cabos">
+      <h2>Tipos de <span>Cabos</span> Ópticos</h2>
+      <div class="section-line"></div>
+
+      <h3><span class="badge badge-cable">ADSS</span> All-Dielectric Self-Supporting</h3>
+      <ul>
+        <li>Sem elementos metálicos — seguro para uso próximo a linhas de energia</li>
+        <li>Vão: <strong>80 a 200+ metros</strong> dependendo do projeto e carga de vento</li>
+        <li>Fibras: 12 a 288, diâmetro externo 10-16mm</li>
+        <li>Resistência à tração: 600 a 2700 kgf</li>
+        <li>Capa PE preta com proteção UV</li>
+      </ul>
+
+      <h3><span class="badge badge-cable">Figura-8 / ASU</span> Auto-Sustentado</h3>
+      <ul>
+        <li>Fio mensageiro de aço integrado ao cabo (seção em forma de 8)</li>
+        <li>Dispensa cabo de sustentação separado</li>
+        <li>Fibras: 2 a 144, mensageiro 1,0 a 3,0mm</li>
+        <li>Vão máximo: 80-100m — <strong>muito popular no Brasil</strong></li>
+      </ul>
+
+      <h3><span class="badge badge-cable">Subterrâneo / Duto</span></h3>
+      <ul>
+        <li>Perfil circular, capa PEAD (preta ou colorida)</li>
+        <li>Versões com armadura de aço para enterramento direto</li>
+        <li>Tubos loose com gel ou dry-block</li>
+        <li>12 a 576+ fibras</li>
+      </ul>
+
+      <h3><span class="badge badge-cable">Drop</span> Cabo de Acesso</h3>
+      <table class="data-table">
+        <thead>
+          <tr><th>Tipo</th><th>Uso</th><th>Dimensões</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Drop Autossustentado</td><td>Aéreo (vão até 80m)</td><td class="val">1-2F, mensageiro de aço</td></tr>
+          <tr><td>Drop Baixa Fricção</td><td>Dutos e subdutos</td><td class="val">1-2F, capa lisa</td></tr>
+          <tr><td>Drop Compacto/Tight</td><td>Interno</td><td class="val">1-2F, 2×3mm</td></tr>
+          <tr><td>Drop Circular</td><td>Risers prediais</td><td class="val">1-12F, 3-5mm</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Tipos de Fibra</h3>
+      <table class="data-table">
+        <thead>
+          <tr><th>Padrão</th><th>Descrição</th><th>Raio Mín. Curvatura</th><th>Aplicação</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>G.652D</td><td>Monomodo padrão</td><td class="val">30mm (100 voltas)</td><td>Feeder, distribuição</td></tr>
+          <tr><td>G.657A1</td><td>Insensível à curvatura</td><td class="val">10mm (1 volta)</td><td>Distribuição, drop</td></tr>
+          <tr><td>G.657A2</td><td>Curvatura aprimorada</td><td class="val ok">7,5mm (1 volta)</td><td>Drop, interno</td></tr>
+          <tr><td>G.657B3</td><td>Máxima tolerância</td><td class="val ok">5mm (1 volta)</td><td>Roteamento interno apertado</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 4. CÓDIGO DE CORES -->
+    <div class="section" id="codigo-cores">
+      <h2>Código de <span>Cores</span> das Fibras</h2>
+      <div class="section-line"></div>
+
+      <p>Padrão Telcordia / ANSI/TIA-598 — usado universalmente no Brasil para identificação das 12 fibras por tubo:</p>
+
+      <div class="color-grid">
+        <div class="color-swatch"><div class="swatch-circle" style="background:#2563eb;"></div><span class="swatch-num">1</span><span class="swatch-label">Azul</span></div>
+        <div class="color-swatch"><div class="swatch-circle" style="background:#f97316;"></div><span class="swatch-num">2</span><span class="swatch-label">Laranja</span></div>
+        <div class="color-swatch"><div class="swatch-circle" style="background:#22c55e;"></div><span class="swatch-num">3</span><span class="swatch-label">Verde</span></div>
+        <div class="color-swatch"><div class="swatch-circle" style="background:#78350f;"></div><span class="swatch-num">4</span><span class="swatch-label">Marrom</span></div>
+        <div class="color-swatch"><div class="swatch-circle" style="background:#6b7280;"></div><span class="swatch-num">5</span><span class="swatch-label">Cinza</span></div>
+        <div class="color-swatch"><div class="swatch-circle" style="background:#f5f5f5;"></div><span class="swatch-num">6</span><span class="swatch-label">Branco</span></div>
+        <div class="color-swatch"><div class="swatch-circle" style="background:#ef4444;"></div><span class="swatch-num">7</span><span class="swatch-label">Vermelho</span></div>
+        <div class="color-swatch"><div class="swatch-circle" style="background:#1a1a1a; border-color:#444;"></div><span class="swatch-num">8</span><span class="swatch-label">Preto</span></div>
+        <div class="color-swatch"><div class="swatch-circle" style="background:#eab308;"></div><span class="swatch-num">9</span><span class="swatch-label">Amarelo</span></div>
+        <div class="color-swatch"><div class="swatch-circle" style="background:#8b5cf6;"></div><span class="swatch-num">10</span><span class="swatch-label">Violeta</span></div>
+        <div class="color-swatch"><div class="swatch-circle" style="background:#f472b6;"></div><span class="swatch-num">11</span><span class="swatch-label">Rosa</span></div>
+        <div class="color-swatch"><div class="swatch-circle" style="background:#06b6d4;"></div><span class="swatch-num">12</span><span class="swatch-label">Aqua</span></div>
+      </div>
+
+      <div class="info-box">
+        Os <strong>tubos (buffer tubes)</strong> do cabo seguem a mesma sequência de 12 cores. Cabos com mais de 12 tubos repetem a sequência com marcação traço/faixa.
+      </div>
+    </div>
+
+    <!-- 5. INFRAESTRUTURA -->
+    <div class="section" id="infraestrutura">
+      <h2>Construção de <span>Infraestrutura</span></h2>
+      <div class="section-line"></div>
+
+      <h3>Construção Aérea</h3>
+
+      <p>Compartilhamento de postes com concessionárias de energia (regulamentação ANATEL/ANEEL). Zona de telecomunicações: <strong>5,0m a 5,40m</strong> acima do solo.</p>
+
+      <table class="data-table">
+        <thead>
+          <tr><th>Situação</th><th>Altura Mínima do Solo</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Sobre rodovias / ruas</td><td class="val">5,0 m</td></tr>
+          <tr><td>Sobre calçadas / áreas de pedestres</td><td class="val">3,5 m</td></tr>
+        </tbody>
+      </table>
+
+      <h4>Ferragens e Acessórios Aéreos</h4>
+      <table class="data-table">
+        <thead>
+          <tr><th>Acessório</th><th>Função</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>Alça de suspensão</strong></td><td>Sustenta o cabo em postes de passagem (tangente). Sem transferência de tração.</td></tr>
+          <tr><td><strong>Alça de ancoragem</strong></td><td>Fixa o cabo em postes de fim de lance / ângulo. Transfere toda a tração.</td></tr>
+          <tr><td><strong>Retentores</strong></td><td>Dead-end clamps para ADSS — alças preformadas que agarram o cabo por fricção.</td></tr>
+          <tr><td><strong>Esticadores</strong></td><td>Regulam a flecha/tensão do cabo. Tipo catraca ou rosca entre alça e suporte.</td></tr>
+          <tr><td><strong>Braçadeira tipo D</strong></td><td>Fixação em postes de madeira/concreto (parafuso passante).</td></tr>
+          <tr><td><strong>Fita de aço + fecho</strong></td><td>Fixação em postes circulares de concreto (steel banding).</td></tr>
+          <tr><td><strong>Roldanas</strong></td><td>Guiam o cabo durante a instalação. Removidas após lançamento.</td></tr>
+        </tbody>
+      </table>
+
+      <div class="info-box">
+        <strong>Reserva técnica:</strong> Mínimo de 10-20m de cabo reserva em cada lado de um ponto de emenda. Permite re-entrada futura para reparos.
+      </div>
+
+      <h3>Construção Subterrânea</h3>
+
+      <table class="data-table">
+        <thead>
+          <tr><th>Componente</th><th>Especificação</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>Dutos PEAD</strong></td><td>Corrugados ou parede lisa. Diâmetros: 32mm (1"), 40mm, 50mm (2"), 100mm (4")</td></tr>
+          <tr><td><strong>Triducto / Quadriducto</strong></td><td>3 ou 4 subdutos fundidos. Bore individual: 22-32mm cada</td></tr>
+          <tr><td><strong>Microdutos</strong></td><td>5/3,5mm, 7/5,5mm, 10/8mm, 12/10mm (OD/ID) para fibra soprada</td></tr>
+          <tr><td><strong>Caixas de passagem</strong></td><td>30×30, 40×40, 60×60cm — concreto ou polímero</td></tr>
+          <tr><td><strong>Poços de visita (PV)</strong></td><td>Câmaras subterrâneas para emendas maiores. Acesso humano (NR-33)</td></tr>
+        </tbody>
+      </table>
+
+      <p style="margin-top:12px;"><strong>Técnicas de puxamento:</strong> Tração máxima conforme fabricante (100-270 kgf curta, 60-90 kgf longa). Usar lubrificante. Puxamento máximo por lance: 500-2000m. Para microdutos: <strong>fibra soprada</strong> (sopro com ar comprimido 8-12 bar).</p>
+
+      <h3>Rede Interna Predial</h3>
+      <table class="data-table">
+        <thead>
+          <tr><th>Componente</th><th>Descrição</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>Cabo Riser</strong></td><td>Backbone vertical, 12-48F, tight-buffered, capa LSZH (baixa emissão de fumaça)</td></tr>
+          <tr><td><strong>Caixa de distribuição de andar</strong></td><td>Derivação do riser para os apartamentos, pode conter splitter</td></tr>
+          <tr><td><strong>Cordão óptico interno</strong></td><td>1-2F, capa LSZH, do corredor até o apartamento</td></tr>
+          <tr><td><strong>Roseta óptica</strong></td><td>Tomada de parede com adaptador SC/APC — ponto de conexão do cliente</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 6. SPLITTERS -->
+    <div class="section" id="splitters">
+      <h2>Estratégias de <span>Divisão</span></h2>
+      <div class="section-line"></div>
+
+      <div class="card-grid">
+        <div class="card">
+          <h4>Centralizada</h4>
+          <p>Splitter único (ex: 1:64) no POP. Uma fibra dedicada até cada cliente. <strong>Simples de gerenciar</strong>, mas exige enorme quantidade de fibras no feeder.</p>
+          <span class="card-tag tag-fiber">Redes pequenas / Enterprise</span>
+        </div>
+        <div class="card" style="border-color: #7c5cfc;">
+          <h4>Distribuída (2 níveis)</h4>
+          <p>1° nível no CEO (1:8) + 2° nível na CTO (1:8) = 1:64 total. <strong>Otimiza o uso de fibras</strong>. Crescimento flexível.</p>
+          <span class="card-tag tag-fiber">Mais comum no Brasil</span>
+        </div>
+        <div class="card">
+          <h4>Cascateada (3+ níveis)</h4>
+          <p>Três ou mais estágios (ex: 1:4 → 1:4 → 1:4). Raro — adiciona complexidade e perda óptica excessiva.</p>
+          <span class="card-tag tag-infra">Uso excepcional</span>
+        </div>
+      </div>
+
+      <div class="info-box">
+        <strong>Arquitetura mais utilizada pelos ISPs brasileiros:</strong> Divisão distribuída em 2 níveis — 1:8 no CEO + 1:8 na CTO = <strong>1:64 total</strong>. Permite feeder com poucas fibras e escala gradual.
+      </div>
+    </div>
+
+    <!-- 7. CEO / CTO -->
+    <div class="section" id="ceo-cto">
+      <h2><span>CEO</span> e <span>CTO</span></h2>
+      <div class="section-line"></div>
+
+      <h3>CEO — Caixa de Emenda Óptica</h3>
+      <p>Abriga emendas por fusão nas junções da rede feeder e distribuição. <strong>Sem portas de cliente.</strong></p>
+
+      <table class="data-table">
+        <thead>
+          <tr><th>Tipo</th><th>Formato</th><th>Uso</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Horizontal (torpedo)</td><td>Cilíndrica</td><td>Aérea ou subterrânea</td></tr>
+          <tr><td>Vertical (domo/cúpula)</td><td>Formato de domo</td><td>Poço de visita</td></tr>
+          <tr><td>In-line</td><td>Passagem reta</td><td>Emendas em linha</td></tr>
+          <tr><td>Derivação</td><td>Com saídas laterais</td><td>Pontos de ramificação</td></tr>
+        </tbody>
+      </table>
+
+      <p><strong>Capacidades:</strong> 12-24F (pequena), 48-96F (média), 144-288F (grande), 432-576F (extra grande).</p>
+      <p><strong>Vedação:</strong> IP68 — tubo termocontrátil ou selo mecânico com teste de pressão.</p>
+
+      <div class="info-box">
+        <strong>Organização interna:</strong> Bandejas de emenda empilhadas (12-24 emendas/bandeja). Protetores termocontráteis. Módulos de splitter 1° nível quando arquitetura distribuída. Cabos entrada/saída organizados e fixos.
+      </div>
+
+      <h3>CTO — Caixa Terminal Óptica</h3>
+      <p>Ponto de acesso do cliente. Contém splitter de 2° nível e portas de saída para os drops. Também chamada <strong>NAP</strong> (Network Access Point).</p>
+
+      <table class="data-table">
+        <thead>
+          <tr><th>Capacidade</th><th>Splitter</th><th>Instalação</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="val">8 portas</td><td>1:8 PLC</td><td>Poste ou parede</td></tr>
+          <tr><td class="val">16 portas</td><td>1:16 ou 2×1:8</td><td>Poste ou parede</td></tr>
+          <tr><td class="val">32 portas</td><td>2×1:16 ou 4×1:8</td><td>Poste, parede ou subterrâneo</td></tr>
+        </tbody>
+      </table>
+
+      <p><strong>Conexão:</strong> Fibra de distribuição entra → emendada ao splitter → cada saída em adaptador SC/APC → drop do cliente conecta via conector.</p>
+      <p><strong>Cobertura típica:</strong> 1 CTO atende 8-16 residências num raio de <strong>50 a 200m</strong>.</p>
+    </div>
+
+    <!-- 8. FUSÃO -->
+    <div class="section" id="fusao">
+      <h2>Emenda por <span>Fusão</span></h2>
+      <div class="section-line"></div>
+
+      <div class="steps">
+        <div class="step">
+          <h4>Preparação do Cabo</h4>
+          <p>Abrir a capa do cabo, identificar e separar os tubos/fibras pelo código de cores.</p>
+        </div>
+        <div class="step">
+          <h4>Preparação da Fibra</h4>
+          <p>Decapar revestimento (250μm → 125μm fibra nua). Limpar com álcool isopropílico e lenço lint-free. Inserir protetor termocontrátil antes de clivar.</p>
+        </div>
+        <div class="step">
+          <h4>Clivagem</h4>
+          <p>Corte de precisão a 90° com clivador. Ângulo deve ser &lt;1°. Comprimento de clivagem: 8-16mm conforme especificação da máquina.</p>
+        </div>
+        <div class="step">
+          <h4>Fusão</h4>
+          <p>Posicionar fibras na máquina de fusão. Alinhamento automático (núcleo ou casca). Arco elétrico funde as pontas. Perda estimada exibida na tela.</p>
+        </div>
+        <div class="step">
+          <h4>Proteção</h4>
+          <p>Deslizar protetor termocontrátil sobre o ponto de fusão e aquecer no forno da máquina.</p>
+        </div>
+        <div class="step">
+          <h4>Armazenamento</h4>
+          <p>Posicionar a emenda protegida na bandeja de emenda, respeitando raio mínimo de curvatura (30-40mm nas curvas da bandeja).</p>
+        </div>
+      </div>
+
+      <h3>Tipos de Máquina de Fusão</h3>
+      <table class="data-table">
+        <thead>
+          <tr><th>Tipo</th><th>Perda Média</th><th>Modelos</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>Alinhamento por núcleo</strong></td><td class="val ok">&lt; 0,02 dB</td><td>Fujikura FSM-90S/70S, Sumitomo TYPE-82C, FITEL S179A</td></tr>
+          <tr><td><strong>Alinhamento por casca</strong></td><td class="val warn">0,05 – 0,10 dB</td><td>Fujikura 22S, Jilong, DVP, Signalfire</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Conector de Campo (Fast Connector)</h3>
+      <p>Conector SC/APC pré-polido com emenda mecânica interna. Instalável em campo sem fusão. Perda típica: <strong>0,3 – 0,5 dB</strong>. Usado na terminação de drops em CTOs e rosetas. Marcas: 3M, Furukawa, fabricantes chineses.</p>
+    </div>
+
+    <!-- 9. DROP -->
+    <div class="section" id="drop">
+      <h2>Instalação de <span>Drop</span></h2>
+      <div class="section-line"></div>
+
+      <div class="steps">
+        <div class="step">
+          <h4>Identificar a CTO</h4>
+          <p>Localizar a CTO que atende a região do cliente. Verificar porta disponível no splitter.</p>
+        </div>
+        <div class="step">
+          <h4>Levantar a Rota</h4>
+          <p>Definir trajeto físico CTO → cliente. Aéreo (poste a poste), subterrâneo (duto) ou fachada (parede externa).</p>
+        </div>
+        <div class="step">
+          <h4>Lançar o Cabo Drop</h4>
+          <p>Fixar na CTO com retentor. Rotear pelos postes com ganchos/anéis. Manter flecha adequada. Fixar no ponto de entrada do imóvel.</p>
+        </div>
+        <div class="step">
+          <h4>Entrada no Imóvel</h4>
+          <p>Usar passa-muro para entrada limpa. Vedar a perfuração. Rotear internamente por canaletas ou conduítes.</p>
+        </div>
+        <div class="step">
+          <h4>Terminação</h4>
+          <p>Na roseta óptica: terminar com conector SC/APC (fast connector ou fusão com pigtail).</p>
+        </div>
+        <div class="step">
+          <h4>Instalar a ONT</h4>
+          <p>Conectar ONT à roseta via patch cord SC/APC. Alimentar com energia. Conectar dispositivos via Ethernet. Registrar na OLT (serial, VLAN, perfil de banda).</p>
+        </div>
+        <div class="step">
+          <h4>Testar e Validar</h4>
+          <p>Medir potência com power meter antes de conectar ONT. Verificar registro na OLT (status online). Teste de velocidade.</p>
+        </div>
+      </div>
+
+      <div class="info-box">
+        <strong>Boas práticas de drop:</strong> Vão aéreo máximo 40-80m · Usar guias de curva em quinas · Reserva técnica de 1-2m em cada ponta · Identificar o drop na CTO com dados do cliente · Comprimento máximo CTO→ONT: 100-300m.
+      </div>
+    </div>
+
+    <!-- 10. TESTES -->
+    <div class="section" id="testes">
+      <h2>Testes e <span>Comissionamento</span></h2>
+      <div class="section-line"></div>
+
+      <h3>OTDR — Reflectômetro Óptico</h3>
+      <p>Envia pulsos laser e analisa luz retroespalhada/refletida. Produz traço completo da fibra.</p>
+
+      <table class="data-table">
+        <thead>
+          <tr><th>O que mostra</th><th>Valor esperado</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Atenuação da fibra</td><td class="val">0,35 dB/km @1310nm · 0,22 dB/km @1550nm</td></tr>
+          <tr><td>Emenda por fusão</td><td class="val ok">≤ 0,1 dB (não refletivo)</td></tr>
+          <tr><td>Conector</td><td class="val">≤ 0,5 dB perda · reflexão ≤ -55 dB (APC)</td></tr>
+          <tr><td>Curvatura (macrobend)</td><td class="val warn">Perda @1550nm >> perda @1310nm = indicador de curva</td></tr>
+          <tr><td>Splitter</td><td class="val">10-20 dB (evento de alta perda, normal)</td></tr>
+        </tbody>
+      </table>
+
+      <div class="info-box">
+        <strong>Protocolo de teste:</strong> OTDR bidirecional em 1310nm e 1550nm · Usar bobina de lançamento (500-2000m) e bobina de recepção · Medir perda ponta a ponta com OLS + Power Meter · ORL > 32 dB para conectores APC · Nível na ONT: -8 a -25 dBm (ideal) · Arquivar traços SOR.
+      </div>
+
+      <h3>Procedimento de Aceitação FTTH</h3>
+      <div class="steps">
+        <div class="step">
+          <h4>Traço OTDR</h4>
+          <p>Teste pelo lado da OLT em 1310nm e 1550nm com bobina de lançamento e recepção.</p>
+        </div>
+        <div class="step">
+          <h4>Perda Ponta a Ponta</h4>
+          <p>OLS + Power Meter bidirecional em 1310/1550nm. Comparar com o orçamento óptico do projeto.</p>
+        </div>
+        <div class="step">
+          <h4>ORL (Perda de Retorno Óptica)</h4>
+          <p>Deve ser > 32 dB para conectores APC. Valores baixos indicam reflexão excessiva.</p>
+        </div>
+        <div class="step">
+          <h4>Nível de Sinal na ONT</h4>
+          <p>Power meter na porta da ONT: ideal entre -8 dBm e -25 dBm. Registrar valor.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 11. SEGURANÇA -->
+    <div class="section" id="seguranca">
+      <h2>Normas de <span>Segurança</span></h2>
+      <div class="section-line"></div>
+
+      <div class="card-grid">
+        <div class="card">
+          <h4><span class="badge badge-nr">NR-10</span></h4>
+          <p style="margin-top:8px;"><strong>Segurança em Eletricidade</strong> — obrigatória para trabalho em postes compartilhados com rede elétrica. Curso de 40h básico + 40h SEP. Distâncias mínimas de aproximação.</p>
+        </div>
+        <div class="card">
+          <h4><span class="badge badge-nr">NR-35</span></h4>
+          <p style="margin-top:8px;"><strong>Trabalho em Altura</strong> — qualquer trabalho acima de 2,0m. Curso 8h. Cinturão paraquedista + talabarte duplo + trava-queda. PT obrigatória.</p>
+        </div>
+        <div class="card">
+          <h4><span class="badge badge-nr">NR-18</span></h4>
+          <p style="margin-top:8px;"><strong>Construção Civil</strong> — aplicável à obra de infraestrutura telecom. Organização do canteiro, escavações, EPIs, sinalização.</p>
+        </div>
+        <div class="card">
+          <h4><span class="badge badge-nr">NR-33</span></h4>
+          <p style="margin-top:8px;"><strong>Espaços Confinados</strong> — obrigatória para entrada em PVs (poços de visita). Detecção de gases, vigia externo, plano de resgate.</p>
+        </div>
+      </div>
+
+      <h3>EPIs Obrigatórios</h3>
+      <table class="data-table">
+        <thead>
+          <tr><th>EPI</th><th>Aplicação</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Capacete classe B</td><td>Isolação elétrica + impacto</td></tr>
+          <tr><td>Óculos de proteção</td><td>Fragmentos de fibra, respingos</td></tr>
+          <tr><td>Luva isolante de borracha</td><td>Proximidade de rede elétrica</td></tr>
+          <tr><td>Luva de vaqueta</td><td>Manuseio de cabos</td></tr>
+          <tr><td>Calçado isolante</td><td>Proteção elétrica</td></tr>
+          <tr><td>Cinturão tipo paraquedista</td><td>Trabalho em altura</td></tr>
+          <tr><td>Talabarte duplo c/ absorvedor</td><td>Trabalho em altura</td></tr>
+          <tr><td>Protetor auricular</td><td>Geradores / compressores</td></tr>
+          <tr><td>Colete refletivo</td><td>Trabalho em via pública</td></tr>
+          <tr><td>Protetor solar</td><td>Trabalho externo</td></tr>
+        </tbody>
+      </table>
+
+      <div class="info-box" style="border-color: #f87171;">
+        <strong style="color: #f87171;">Segurança com fibra óptica:</strong> NUNCA olhar pela ponta da fibra (radiação laser invisível pode danificar a retina). Resíduos de fibra clivada são extremamente cortantes e invisíveis — descarte em recipiente dedicado. Usar base preta para visualizar fragmentos. Lavar as mãos após clivar.
+      </div>
+    </div>
+
+    <!-- 12. DOCUMENTAÇÃO -->
+    <div class="section" id="documentacao">
+      <h2>Documentação de <span>Projeto</span></h2>
+      <div class="section-line"></div>
+
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-icon">&#128209;</div>
+          <h4>As-Built</h4>
+          <p>Desenho atualizado da rede como construída (não apenas planejada). Rotas exatas, postes, caixas, comprimentos. Formato CAD (DWG) ou GIS.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">&#128506;</div>
+          <h4>Mapa de Rota</h4>
+          <p>Representação geográfica da planta. Postes, cabos, CEOs, CTOs, dutos, PVs. Software: OZmap, QGIS, Google Earth Pro (KMZ).</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">&#128200;</div>
+          <h4>Diagrama de Emenda</h4>
+          <p>Quais fibras estão emendadas em cada CEO/CTO. Cor do tubo + cor da fibra + cabo origem/destino + perda medida. Por bandeja.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">&#128202;</div>
+          <h4>Planilha de Power Budget</h4>
+          <p>Cálculo de perda total OLT→ONT por enlace. Fibra + emendas + conectores + splitters + margem. Template Excel padronizado.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">&#128247;</div>
+          <h4>Relatório Fotográfico</h4>
+          <p>Registro fotográfico de cada etapa da instalação. Evidência de conformidade com o projeto.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">&#128196;</div>
+          <h4>ART / Certificação</h4>
+          <p>ART (CREA) do engenheiro responsável. Traços OTDR (SOR) e readings de power meter arquivados por fibra/segmento.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 13. MARCAS -->
+    <div class="section" id="marcas">
+      <h2>Marcas e <span>Equipamentos</span></h2>
+      <div class="section-line"></div>
+
+      <h3>Equipamentos Ativos (OLT / ONT)</h3>
+      <table class="data-table">
+        <thead>
+          <tr><th>Marca</th><th>Origem</th><th>Modelos Destaque</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>Huawei</strong></td><td>China</td><td>MA5800-X2/X7/X15/X17</td></tr>
+          <tr><td><strong>ZTE</strong></td><td>China</td><td>C300, C600</td></tr>
+          <tr><td><strong>Fiberhome</strong></td><td>China</td><td>AN5516-01/04/06</td></tr>
+          <tr><td><strong>Datacom</strong></td><td>Brasil (RS)</td><td>DM4610, DM4615</td></tr>
+          <tr><td><strong>Parks</strong></td><td>Brasil (RS)</td><td>FiberLink 10000</td></tr>
+          <tr><td><strong>Intelbras</strong></td><td>Brasil (SC)</td><td>OLT 8820i, OLT 4840E</td></tr>
+          <tr><td><strong>Nokia</strong></td><td>Finlândia</td><td>ISAM/Lightspan (grandes operadoras)</td></tr>
+        </tbody>
+      </table>
+
+      <h3>ONTs Comuns</h3>
+      <table class="data-table">
+        <thead>
+          <tr><th>Marca</th><th>Modelos</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Huawei</td><td class="val">HG8245H5, HG8546M, EG8145V5 (Wi-Fi 6)</td></tr>
+          <tr><td>ZTE</td><td class="val">F670L, F6600P</td></tr>
+          <tr><td>Fiberhome</td><td class="val">AN5506-04, HG6145F</td></tr>
+          <tr><td>Intelbras</td><td class="val">ONT 142NW, ONT 121W</td></tr>
+          <tr><td>Datacom</td><td class="val">DM985-410, DM986-414</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Infraestrutura Passiva / Cabos</h3>
+      <table class="data-table">
+        <thead>
+          <tr><th>Marca</th><th>Produtos</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>Furukawa</strong></td><td>Cabos, CEO, CTO, conectores, pigtails, DIO — líder em passivos no Brasil</td></tr>
+          <tr><td><strong>Prysmian</strong></td><td>Cabos ópticos e acessórios (produção nacional)</td></tr>
+          <tr><td><strong>Fibracem</strong></td><td>Cabos, caixas, ferragens — fabricante brasileiro competitivo</td></tr>
+          <tr><td><strong>CommScope</strong></td><td>Caixas, conectores, splitters — marca premium internacional</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Equipamentos de Teste</h3>
+      <table class="data-table">
+        <thead>
+          <tr><th>Marca</th><th>Produtos</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>EXFO</td><td>OTDRs (FTB-1, MaxTester 730C), power meters, sondas de inspeção</td></tr>
+          <tr><td>VIAVI Solutions</td><td>OTDRs (MTS-2000, SmartOTDR), plataformas de teste</td></tr>
+          <tr><td>Yokogawa</td><td>OTDRs (AQ7280, AQ1210)</td></tr>
+          <tr><td>Anritsu</td><td>OTDRs portáteis (MT9085)</td></tr>
+          <tr><td>Tribrer / Grandway</td><td>OTDRs e power meters econômicos — muito comuns no Brasil</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Máquinas de Fusão</h3>
+      <table class="data-table">
+        <thead>
+          <tr><th>Marca</th><th>Modelos</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>Fujikura</strong></td><td class="val">FSM-90S, FSM-70S, 41S, 22S — líder de mercado</td></tr>
+          <tr><td><strong>Sumitomo</strong></td><td class="val">TYPE-82C, TYPE-72C, T-602C</td></tr>
+          <tr><td><strong>FITEL (Furukawa)</strong></td><td class="val">S179A</td></tr>
+          <tr><td><strong>Chinesas</strong></td><td class="val">DVP, Jilong, Signalfire, Tumtec — mercado econômico</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 14. BOAS PRÁTICAS -->
+    <div class="section" id="boas-praticas">
+      <h2>Boas Práticas e <span>Qualidade</span></h2>
+      <div class="section-line"></div>
+
+      <h3>Raio Mínimo de Curvatura</h3>
+      <table class="data-table">
+        <thead>
+          <tr><th>Tipo de Cabo</th><th>Durante Instalação</th><th>Instalado (Permanente)</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Feeder (loose tube)</td><td class="val">20 × DE</td><td class="val">10 × DE</td></tr>
+          <tr><td>Distribuição</td><td class="val">20 × DE</td><td class="val">10 × DE</td></tr>
+          <tr><td>Drop (flat)</td><td class="val">20 × DE ou 30mm mín</td><td class="val">10 × DE ou 15mm mín</td></tr>
+          <tr><td>Patch cord</td><td>—</td><td class="val">30mm</td></tr>
+        </tbody>
+      </table>
+      <p style="font-size:0.8rem; color:#555; margin-top:6px;">DE = diâmetro externo do cabo.</p>
+
+      <h3>Padrões de Conectores</h3>
+      <div class="info-box">
+        <strong>SC/APC (verde)</strong> é o padrão universal em redes GPON no Brasil — da OLT ao DIO, CEOs, CTOs, rosetas e ONTs. Conectores <strong>UPC (azul) NÃO são usados</strong> em redes PON (problemas de reflexão). Todos os conectores devem ser inspecionados e limpos antes da conexão.
+      </div>
+
+      <h3>DIO — Distribuidor Interno Óptico</h3>
+      <p>Patch panel no POP montado em rack. Termina as fibras feeder do campo. Pigtails fusionados às fibras, conectores no painel frontal. Patch cords conectam DIO → portas OLT. Tamanhos: 12, 24, 48, 72, 96, 144 portas.</p>
+
+      <h3>Regras de Ouro</h3>
+      <ul>
+        <li><strong>Identificação:</strong> Todo cabo etiquetado nas duas pontas e em cada ponto de acesso. CTOs com ID único (ex: CTO-BAIRRO-001). Etiquetas duráveis, UV e à prova d'água.</li>
+        <li><strong>Limpeza:</strong> Conectores inspecionados e limpos antes de cada conexão (one-click cleaner ou lenço com álcool). Conector sujo = causa nº 1 de problemas em rede.</li>
+        <li><strong>Organização:</strong> Fibras em caixas sem tensão, respeitando raios de curvatura. Excesso de fibra enrolado ordenadamente.</li>
+        <li><strong>Registro:</strong> Toda emenda com perda registrada. Todo enlace com power budget calculado. Todo cliente com potência na ONT documentada. Traços OTDR (SOR) arquivados.</li>
+        <li><strong>Reserva técnica:</strong> Sempre deixar folga de cabo nos pontos de emenda para manutenção futura.</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    &copy; 2026 <a href="portfolio.html">Lualker</a> — Técnico de Telecomunicações · Especialista em Construção de Redes FTTX
+  </footer>
+
+  <script>
+    document.querySelectorAll('a[href^="#"]').forEach(a => {
+      a.addEventListener('click', e => {
+        e.preventDefault();
+        const target = document.querySelector(a.getAttribute('href'));
+        if (target) target.scrollIntoView({ behavior: 'smooth' });
+      });
+    });
+  </script>
+</body>
+</html>

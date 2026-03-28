@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lualker - Tarefas</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #0f0f0f;
+      color: #e0e0e0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 40px 20px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 600px;
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      font-weight: 300;
+      margin-bottom: 30px;
+      color: #fff;
+      letter-spacing: 2px;
+    }
+
+    h1 span { color: #7c5cfc; font-weight: 600; }
+
+    .input-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 30px;
+    }
+
+    .input-row input {
+      flex: 1;
+      padding: 14px 18px;
+      border: 1px solid #2a2a2a;
+      border-radius: 10px;
+      background: #1a1a1a;
+      color: #fff;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .input-row input:focus { border-color: #7c5cfc; }
+
+    .input-row button {
+      padding: 14px 22px;
+      border: none;
+      border-radius: 10px;
+      background: #7c5cfc;
+      color: #fff;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: background 0.2s;
+      white-space: nowrap;
+    }
+
+    .input-row button:hover { background: #6a48e6; }
+
+    .filters {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .filters button {
+      padding: 6px 16px;
+      border: 1px solid #2a2a2a;
+      border-radius: 20px;
+      background: transparent;
+      color: #888;
+      font-size: 0.82rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .filters button.active,
+    .filters button:hover {
+      border-color: #7c5cfc;
+      color: #fff;
+    }
+
+    .counter {
+      font-size: 0.82rem;
+      color: #555;
+      margin-bottom: 14px;
+    }
+
+    .task-list { list-style: none; }
+
+    .task-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 16px;
+      background: #1a1a1a;
+      border-radius: 10px;
+      margin-bottom: 8px;
+      transition: background 0.2s, opacity 0.3s;
+      animation: slideIn 0.25s ease;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(-8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .task-item:hover { background: #1f1f1f; }
+
+    .task-item.done .task-text {
+      text-decoration: line-through;
+      color: #555;
+    }
+
+    .checkbox {
+      width: 20px;
+      height: 20px;
+      border: 2px solid #3a3a3a;
+      border-radius: 50%;
+      cursor: pointer;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .checkbox:hover { border-color: #7c5cfc; }
+
+    .task-item.done .checkbox {
+      background: #7c5cfc;
+      border-color: #7c5cfc;
+    }
+
+    .task-item.done .checkbox::after {
+      content: '✓';
+      color: #fff;
+      font-size: 12px;
+    }
+
+    .task-text {
+      flex: 1;
+      font-size: 0.95rem;
+      transition: color 0.2s;
+    }
+
+    .delete-btn {
+      background: none;
+      border: none;
+      color: #3a3a3a;
+      font-size: 1.1rem;
+      cursor: pointer;
+      padding: 4px;
+      transition: color 0.2s;
+      opacity: 0;
+    }
+
+    .task-item:hover .delete-btn { opacity: 1; }
+    .delete-btn:hover { color: #e74c3c; }
+
+    .empty {
+      text-align: center;
+      color: #444;
+      padding: 60px 0;
+      font-size: 0.95rem;
+    }
+
+    .clear-done {
+      margin-top: 20px;
+      text-align: right;
+    }
+
+    .clear-done button {
+      background: none;
+      border: none;
+      color: #555;
+      font-size: 0.82rem;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+
+    .clear-done button:hover { color: #e74c3c; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1><span>lualker</span> tarefas</h1>
+
+    <div class="input-row">
+      <input type="text" id="taskInput" placeholder="Nova tarefa..." autofocus>
+      <button onclick="addTask()">Adicionar</button>
+    </div>
+
+    <div class="filters">
+      <button class="active" onclick="setFilter('all', this)">Todas</button>
+      <button onclick="setFilter('pending', this)">Pendentes</button>
+      <button onclick="setFilter('done', this)">Concluídas</button>
+    </div>
+
+    <div class="counter" id="counter"></div>
+    <ul class="task-list" id="taskList"></ul>
+    <div class="clear-done" id="clearDone" style="display:none;">
+      <button onclick="clearDone()">Limpar concluídas</button>
+    </div>
+  </div>
+
+  <script>
+    let tasks = JSON.parse(localStorage.getItem('lualker_tasks') || '[]');
+    if (!tasks.length) {
+      tasks = [
+        { text: 'Comprar café e pão na padaria', done: false, id: Date.now() },
+        { text: 'Estudar JavaScript por 30 minutos', done: false, id: Date.now() + 1 }
+      ];
+      localStorage.setItem('lualker_tasks', JSON.stringify(tasks));
+    }
+    let filter = 'all';
+
+    const input = document.getElementById('taskInput');
+    input.addEventListener('keydown', e => { if (e.key === 'Enter') addTask(); });
+
+    function save() {
+      localStorage.setItem('lualker_tasks', JSON.stringify(tasks));
+    }
+
+    function addTask() {
+      const text = input.value.trim();
+      if (!text) return;
+      tasks.unshift({ text, done: false, id: Date.now() });
+      input.value = '';
+      save();
+      render();
+    }
+
+    function toggleTask(id) {
+      const t = tasks.find(t => t.id === id);
+      if (t) t.done = !t.done;
+      save();
+      render();
+    }
+
+    function deleteTask(id) {
+      tasks = tasks.filter(t => t.id !== id);
+      save();
+      render();
+    }
+
+    function clearDone() {
+      tasks = tasks.filter(t => !t.done);
+      save();
+      render();
+    }
+
+    function setFilter(f, btn) {
+      filter = f;
+      document.querySelectorAll('.filters button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      render();
+    }
+
+    function render() {
+      const list = document.getElementById('taskList');
+      const filtered = tasks.filter(t =>
+        filter === 'all' ? true : filter === 'done' ? t.done : !t.done
+      );
+
+      const pending = tasks.filter(t => !t.done).length;
+      const done = tasks.filter(t => t.done).length;
+      document.getElementById('counter').textContent =
+        tasks.length ? `${pending} pendente${pending !== 1 ? 's' : ''} · ${done} concluída${done !== 1 ? 's' : ''}` : '';
+
+      document.getElementById('clearDone').style.display = done > 0 ? '' : 'none';
+
+      if (!filtered.length) {
+        list.innerHTML = `<li class="empty">${tasks.length ? 'Nenhuma tarefa neste filtro.' : 'Nenhuma tarefa ainda. Adicione uma!'}</li>`;
+        return;
+      }
+
+      list.innerHTML = filtered.map(t => `
+        <li class="task-item ${t.done ? 'done' : ''}">
+          <div class="checkbox" onclick="toggleTask(${t.id})"></div>
+          <span class="task-text">${escapeHtml(t.text)}</span>
+          <button class="delete-btn" onclick="deleteTask(${t.id})">✕</button>
+        </li>
+      `).join('');
+    }
+
+    function escapeHtml(s) {
+      const d = document.createElement('div');
+      d.textContent = s;
+      return d.innerHTML;
+    }
+
+    render();
+  </script>
+</body>
+</html>
